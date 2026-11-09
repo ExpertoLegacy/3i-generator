@@ -1,0 +1,177 @@
+# What the built-in AI may do on each part. Parts not listed have no AI.
+# modes: write, check, suggest. requires: answers that must exist first (the app disables Write until they do).
+# requires_parts: other parts that must already be built. context: other parts the AI may read.
+# sources: true sends the Source Library. tables: computed tables are sent as read-only facts.
+# suggest: planning fields only, never evidence. target: the column filled when adding a table row.
+# words: [min, max] for the generated text. long: allows a longer reply.
+# people: names reach the model only as placeholders, with their roles explained.
+# images: the one AI image slot allowed here. Evidence parts must never have one.
+# Parts with a diagram in spec/tabs.yaml also get the AI diagram proposal.
+# rules go to the model after the template's own guideline for that part.
+tense_by_tab: {prelim: free, ch1: free, ch2: free, ch3: stage, ch4: stage, ch5: past, app: free}
+
+parts:
+  setup.system:
+    images: logo
+  prelim.title:
+    suggest:
+      title: {ask: "Suggest 3 research titles of about 20 words following the pattern SYSTEM NAME: A Platform Type of System for Users of Locale."}
+  prelim.acknowledgment:
+    modes: [write, check]
+    requires: [thanks]
+    people: true
+    rules: "One page or less. Formal and sincere. Order: adviser and panel, school head, office or users, IT experts and end-users, families. Thank only those listed in INPUT."
+  prelim.abstract:
+    modes: [write, check]
+    requires_parts: [ch1.background, ch3.design, ch4.acceptability, ch5.conclusions]
+    context: [ch1.background, ch3.design, ch3.method.overview, ch3.population, ch4.acceptability, ch4.difference, ch5.conclusions]
+    tense: past
+    words: [150, 250]
+    rules: "One paragraph only, 150 to 250 words, no citations and no tables. Cover the problem, design and model, tools, respondents and instrument, key results, and conclusion. Use only results that appear in INPUT.context."
+    suggest:
+      keywords: {ask: "Suggest 5 keywords, each one short, drawn from the system and the study."}
+  ch1.background:
+    modes: [write, check, guided]
+    requires: [context, situation, problems]
+    guided: {setup: [system_name, system_type, users, locale, process], questions: "6 to 8", research: true}
+    sources: true
+    long: true
+    rules: "Use the student's answers in INPUT.inputs.answers and any notes in the other inputs. Where a required fact about the locale is still unknown, write a short gap such as [KULANG: weekly transactions] instead of guessing. Refer to people at the locale by their role, such as the laboratory custodian, and never by name. Flow: context, current situation, problems, gap, proposed solution, alignment with the class research agenda and DepEd Order No. 39, s. 2016. Do not open with a dictionary definition. No one-sentence paragraphs. Every outside claim needs a citation from INPUT.sources. Use only the evidence the student gave."
+  ch1.sop:
+    modes: [check]
+    suggest:
+      questions: {ask: "Suggest 3 additional research questions that fit a system development study and follow the template's style.", target: question}
+  ch1.objectives:
+    modes: [write, check, guided]
+    guided: {setup: [system_name], questions: "1 to 3"}
+    requires_parts: [ch1.sop]
+    context: [ch1.sop, ch1.background]
+    rules: "First a paragraph stating the general objective: to design, develop, and evaluate the system. Then one list with exactly one specific objective for each research question in INPUT.context, in the same order, each starting with an action verb."
+    suggest:
+      objectives: {ask: "Suggest one specific objective for a research question that has none yet, starting with an action verb."}
+  ch1.framework:
+    modes: [write, check, guided]
+    guided: {setup: [system_name, system_type], questions: "2 to 4"}
+    requires: [input, process, output]
+    context: [ch1.background, ch1.sop, ch1.objectives]
+    rules: "Explain the Input-Process-Output framework in paragraphs. The Process must match the development phases named by the student. Do not draw the diagram."
+  ch1.scope:
+    modes: [write, check, guided]
+    guided: {setup: [system_name, modules, roles, locale], questions: "3 to 5"}
+    context: [ch1.background, ch1.objectives]
+    requires: [scope, limits]
+    rules: "Two organized parts: what the study covers, then its limitations. Be specific about modules, roles, platform, locale, respondents, and school year. The panel checks the finished system against this."
+    suggest:
+      limits: {ask: "Suggest 3 realistic limitations for this kind of system, such as features or settings it will not cover."}
+  ch1.significance:
+    modes: [write, check, guided]
+    guided: {setup: [system_name, system_type], questions: "2 to 4"}
+    context: [ch1.background, ch1.scope]
+    requires: [beneficiaries]
+    rules: "One paragraph per beneficiary row, in the given order. Put the beneficiary's name in lead exactly as given, and do not split, rename, or add beneficiaries. Put the benefit in text. No generic claims. Use the specific benefit the student wrote."
+  ch1.terms:
+    modes: [write, check, guided]
+    guided: {setup: [system_name, system_type], questions: "2 to 4"}
+    context: [ch1.background, ch1.scope]
+    requires: [terms]
+    rules: "One paragraph for each term in INPUT and no others, alphabetical. Put the term in lead and an operational definition of 1 to 3 sentences in text, stating how the term is used in this study."
+    suggest:
+      terms: {ask: "Suggest 5 technical terms from this study that readers may need defined. Give only the terms.", target: term}
+  ch2.literature:
+    modes: [write, check]
+    auto_research: {per_topic: 4, minimum_sources: 4, rule: "Recommend 3 to 5 review topics that the study's literature must cover, drawn from the approved Chapter 1."}
+    context: [ch1.background, ch1.sop, ch1.objectives, ch1.scope, ch1.terms]
+    requires: [topics]
+    sources: true
+    long: true
+    rules: "Use INPUT.inputs.research_topics as the themes, with one heading3 per topic. Use only what each source's notes say. Organize by theme with one heading3 per topic, using the student's topics. Every claim traces to a citation from INPUT.sources. Synthesize sources instead of summarizing them one by one."
+  ch2.studies:
+    modes: [write, check]
+    auto_research: {per_topic: 3, minimum_sources: 3, local_search: true, rule: "Recommend 2 to 3 focused research areas for finding studies similar to this one, drawn from the approved Chapter 1."}
+    context: [ch1.background, ch1.objectives, ch2.literature]
+    requires: [foreign, local]
+    sources: true
+    long: true
+    rules: "Use heading3 'Foreign Studies' and heading3 'Local Studies', using each source's origin in INPUT.sources. For each study give its purpose, method, findings, and relation to this study, stating only what its notes say and leaving out what they do not."
+  ch2.systems:
+    modes: [write, check]
+    auto_research: {per_topic: 3, minimum_sources: 3, rule: "Recommend 2 to 3 search areas for finding published descriptions of existing systems comparable to this one, drawn from the approved Chapter 1."}
+    context: [ch1.background, ch1.scope]
+    requires: [systems]
+    sources: true
+    rules: "One paragraph per comparable system described in INPUT.sources, 3 to 5 in all. Put the system's name or a short description of it in lead. State its features and strengths only as its notes report them, and leave out what they do not say. Add to missing_info that the students should try the actual systems and add what they observe."
+  ch2.synthesis:
+    modes: [write, check]
+    auto_draft: true
+    requires_parts: [ch2.literature, ch2.studies, ch2.systems]
+    context: [ch1.background, ch1.scope, ch2.literature, ch2.studies, ch2.systems]
+    requires: [synthesis]
+    sources: true
+    tables: true
+    rules: "State common findings, the gap, and how the proposed system fills it. Mention the comparison table using its reference token. The discussion must agree with the Yes and No values in the table."
+  ch3.design:
+    modes: [write, check]
+    requires: [design]
+    sources: true
+    rules: "State the research design, its source, and why it fits. Cite only from INPUT.sources."
+  ch3.method.overview:
+    modes: [write, check]
+    requires: [model]
+    sources: true
+    rules: "Explain the software development model, its source, why it was chosen, and its phases."
+  ch3.method.phase1: {modes: [write, check], requires: [text], rules: "Describe the requirements activities the student listed, then functional and non-functional requirements and user roles. Mention the interview guide using {{ref:appendix:interview}} only if interviews were done."}
+  ch3.method.phase2: {modes: [write, check], images: mockup, requires: [text], rules: "Describe design activities and tools. The diagrams appear in Chapter 4, so do not describe their contents."}
+  ch3.method.phase3: {modes: [write, check], requires: [text], rules: "Describe languages, frameworks, database, IDE, version control, and build order exactly as given, with any versions. Include any AI assistance the student disclosed."}
+  ch3.method.phase4: {modes: [write, check], requires: [text], rules: "Describe testing levels, how test cases were made, and how bugs were handled. Refer to the full list using {{ref:appendix:test_cases}}."}
+  ch3.method.phase5: {modes: [write, check], requires: [text], rules: "Describe how the system was installed, how users were oriented, and how evaluation followed. Refer to the manual using {{ref:appendix:manual}}."}
+  ch3.requirements: {modes: [write, check], requires: [hardware, software], tables: true, rules: "Write a brief explanation that introduces the two tables using their reference tokens. Do not repeat the table rows."}
+  ch3.locale: {modes: [write, check], requires: [locale], rules: "Describe where the system was developed, deployed, and evaluated, using only what the student wrote."}
+  ch3.population: {modes: [write, check], requires: [text, groups], tables: true, rules: "Describe the population and the two respondent groups and their qualifications. Mention the table using its reference token."}
+  ch3.sampling: {modes: [write, check], requires: [text], tables: true, sources: true, rules: "Describe the technique for each group, selection criteria, and its source. Do not recalculate any sample size."}
+  ch3.instrument:
+    modes: [write, check]
+    requires: [text]
+    tables: true
+    rules: "Describe the questionnaire, validation, and reliability using only what the student gave. Mention the ISO/IEC 25010 table using its reference token."
+    suggest:
+      indicators: {ask: "Suggest 5 clear evaluation statements for this system that a respondent can rate from 1 to 5.", target: indicator}
+  ch3.gathering: {modes: [write, check], requires: [items], rules: "One list with the steps in chronological order. Keep every step and every {{ref:...}} token the student has."}
+  ch3.ethics: {modes: [write, check], requires: [consent, data], sources: true, rules: "Must mention the Data Privacy Act of 2012 (RA 10173), consent and assent, voluntary participation, and the right to withdraw. Describe only what the student says was done."}
+  ch4.problems: {modes: [write, check], requires: [findings], tables: true, rules: "Present only what was actually found. Mention the table using its reference token."}
+  ch4.design.architecture: {modes: [write, check], requires: [text], rules: "Explain how users, interface, server, and database work together."}
+  ch4.design.usecase: {modes: [write, check], requires: [text], rules: "Explain the users of the system and the processes they perform."}
+  ch4.design.database: {modes: [write, check], requires: [text], rules: "Explain the tables and relationships exactly as the student described them."}
+  ch4.design.modules: {modes: [write, check], requires: [screens], rules: "One paragraph per screen. Put the screen name in lead. State its purpose, who uses it, and what they can do. Describe only what the student wrote."}
+  ch4.testing: {modes: [write, check], requires: [cases], tables: true, rules: "Report the totals from INPUT.tables without changing them. Failed cases must stay visible. Describe bugs and fixes only as the student wrote them."}
+  ch4.acceptability:
+    modes: [write, check]
+    requires: [scores]
+    tables: true
+    sources: true
+    rules: "Follow presentation, analysis, interpretation, and support from related literature. Mention the highest and lowest characteristics, and the overall mean, using only values and verbal interpretations from INPUT.tables. Do not repeat every number. Mention the table using its reference token."
+  ch4.difference: {modes: [write, check], requires: [t, p], tables: true, rules: "State the mean, standard deviation, t-value, p-value, and decision on the null hypothesis exactly as in INPUT.tables. Explain what the result means. Mention the table using its reference token."}
+  ch4.enhancements: {modes: [write, check], requires: [text], requires_parts: [ch4.acceptability], context: [ch4.acceptability], rules: "Propose only enhancements grounded in the respondents' comments and lowest-rated characteristics given in INPUT."}
+  ch5.summary: {modes: [write, check], requires_parts: [ch4.acceptability], context: [ch4.problems, ch4.testing, ch4.acceptability, ch4.difference, ch4.enhancements, ch1.sop], tense: past, rules: "A short paragraph restating the purpose, design, and respondents, then one list with one finding per research question, in order. No new data."}
+  ch5.conclusions: {modes: [write, check], requires_parts: [ch5.summary], context: [ch5.summary, ch4.difference], tense: past, rules: "One list with one conclusion per finding, in order. Generalize instead of repeating numbers. State the decision on the null hypothesis if it was tested."}
+  ch5.recommendations:
+    modes: [write, check]
+    requires_parts: [ch5.conclusions]
+    context: [ch5.conclusions, ch1.significance]
+    tense: free
+    rules: "One list. Each recommendation follows from a conclusion and is addressed to a beneficiary named in INPUT.context."
+    suggest:
+      items: {ask: "Suggest 3 recommendations that follow from the conclusions, each addressed to a named beneficiary."}
+  app.permission: {modes: [write], requires: [text], rules: "Polish this letter of permission for adviser review. Keep every {{...}} name and every fact. Leave signature lines to the students."}
+  app.consent: {modes: [write], requires: [text], rules: "Polish this blank consent and assent form for adviser review. Keep voluntary participation, the right to withdraw, and data privacy under RA 10173."}
+  app.interview:
+    modes: [check]
+    suggest:
+      items: {ask: "Suggest 5 open-ended interview questions that gather requirements for this system."}
+  finish.defense:
+    modes: [defense]
+    images: background
+    long: true
+    requires_parts: [ch1.background, ch3.design, ch4.acceptability, ch5.conclusions]
+    context: [ch1.sop, ch1.objectives, ch1.background, ch1.scope, ch3.design, ch3.method.overview, ch4.testing, ch4.acceptability, ch4.difference, ch5.summary, ch5.conclusions, ch5.recommendations]
+    rules: "Make 10 to 15 slides in this order: title; background and problem; objectives; conceptual framework; methodology; live system demonstration; results; conclusions and recommendations. At most 5 short points per slide. Make 10 to 12 questions that a panel is likely to ask about this specific system, its code, its method, and its results."
+  app.manual: {modes: [write, check], requires: [text], rules: "Turn the student's steps into clear numbered instructions, grouped by module with heading3. Add no feature the student did not describe."}

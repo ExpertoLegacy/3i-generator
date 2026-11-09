@@ -1,0 +1,20 @@
+# Local tools and builds
+.venv/
+.tools/
+dist/
+out/
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# Local settings for assistants and Cloudflare
+.claude/
+relay/.wrangler/
+.wrangler/
+.env
+.env.*
+
+# Student work must never be committed
+*.rrg
+*.rrg-journal
+* Master.docx

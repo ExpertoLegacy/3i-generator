@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Check This Computer</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body class="guide-page">
+<main class="guide-sheet">
+  <p class="guide-back"><a href="/">Back to the app</a></p>
+  <h1>Check this computer</h1>
+  <p class="lede">{{ summary }}</p>
+  <ul class="checks">
+    {% for item in results %}
+    <li class="{{ item.status }}">
+      <strong>{{ item.name }}</strong>
+      <span>{{ {'ok': 'Ready', 'warn': 'Note', 'problem': 'Problem'}[item.status] }}: {{ item.detail }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+  <p class="help">App version {{ version }}. This check reads no reports and sends nothing except a connection test.</p>
+  <button type="button" id="copy-check">Copy these results</button>
+  <span id="copied" role="status"></span>
+</main>
+<script>
+document.getElementById("copy-check").onclick = async () => {
+  const lines = [...document.querySelectorAll(".checks li")].map((li) => `${li.querySelector("strong").innerText}: ${li.querySelector("span").innerText}`);
+  try {
+    await navigator.clipboard.writeText([document.querySelector(".lede").innerText, ...lines].join("\n"));
+    document.getElementById("copied").textContent = " Copied.";
+  } catch {
+    document.getElementById("copied").textContent = " Could not copy. Take a photo of this page instead.";
+  }
+};
+</script>
+</body>
+</html>

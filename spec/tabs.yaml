@@ -1,0 +1,459 @@
+# Every tab, sub-tab, and question in the app. One generic page renders each part from here.
+# Input types: text, textarea, select, checks, repeater, grid.
+# gen: a generator in app/parts/generators.py. If omitted, answers are assembled in order.
+# auto: the page is filled from Project Setup and has no text editor.
+tabs:
+- id: setup
+  label: Project Setup
+  parts:
+  - key: setup.school
+    label: School Profile
+    setup: true
+    inputs:
+    - {id: school_name, label: School, type: text, default: Cabiao Senior High School}
+    - {id: school_address, label: Address, type: text, default: "Palasinan, Cabiao, Nueva Ecija"}
+    - {id: subject, label: Subject, type: text, default: "Inquiries, Investigations and Immersion"}
+    - {id: research_theme, label: Research theme, type: text, default: System Software Development}
+    - {id: adviser, label: Research adviser, type: text, default: Erickson N. Glodo}
+    - {id: principal, label: Principal or SHS assistant principal, type: text}
+    - {id: principal_title, label: Position title, type: text, default: SHS Assistant Principal}
+  - key: setup.people
+    label: Proponents and Panel
+    setup: true
+    inputs:
+    - {id: strand_section, label: Grade 12 strand and section, type: text, placeholder: Grade 12 – TVL-ICT / Turing}
+    - id: proponents
+      label: Proponents
+      type: repeater
+      min_rows: 3
+      add: Add proponent
+      fields:
+      - {id: name, label: Full name, type: text}
+    - {id: month_year, label: Month and year of submission, type: text, placeholder: March 2027}
+    - {id: panel_chair, label: Panel chairperson, type: text}
+    - {id: panel_member_1, label: Panel member, type: text}
+    - {id: panel_member_2, label: Panel member, type: text}
+  - key: setup.system
+    label: System Profile
+    setup: true
+    help: These answers fill in the matching words across your whole report.
+    inputs:
+    - {id: system_name, label: System name, type: text, placeholder: LabTrack}
+    - {id: platform, label: Platform, type: select, options: [web-based, mobile, desktop]}
+    - {id: system_type, label: Type of system, type: text, placeholder: laboratory equipment inventory and borrowing system}
+    - {id: users, label: Users or office, type: text, placeholder: the science department}
+    - {id: locale, label: Locale, type: text, placeholder: Cabiao Senior High School}
+    - {id: process, label: Current process being improved, type: text, placeholder: equipment borrowing process}
+    - {id: dev_model, label: Software development model, type: select, options: [Agile (Scrum), Waterfall, Rapid Application Development, Prototyping, Iterative and Incremental, V-Model]}
+    - {id: modules, label: "Modules, one per line", type: textarea, rows: 5}
+    - {id: roles, label: "User roles, one per line", type: textarea, rows: 3}
+  - key: setup.options
+    label: Report Options
+    setup: true
+    inputs:
+    - {id: stage, label: Report stage, type: select, options: [Final report, Proposal]}
+    - {id: iso_edition, label: ISO/IEC 25010 edition, type: select, options: ["2011", "2023"]}
+    - {id: hypothesis, label: "Test for a significant difference between IT experts and end-users?", type: select, options: ["Yes", "No"]}
+    - id: appendices_off
+      label: Leave out these appendices
+      type: checks
+      options:
+      - [app.interview, E Interview Guide]
+      - [app.editing, K Certificate of Editing]
+      - [app.code, I Selected Source Code]
+
+- id: prelim
+  label: Preliminaries
+  parts:
+  - {key: prelim.cover, label: Cover, auto: true}
+  - key: prelim.title
+    label: Title Page
+    auto: true
+    inputs:
+    - {id: title, label: Research title, type: textarea, rows: 3, help: "Pattern: SYSTEM NAME: A Platform Type of System for Users of Locale. About 20 words."}
+  - {key: prelim.approval, label: Approval Sheet, auto: true}
+  - key: prelim.acknowledgment
+    label: Acknowledgment
+    inputs:
+    - id: thanks
+      label: People and offices to thank
+      type: repeater
+      add: Add person or office
+      fields:
+      - {id: who, label: Who, type: text}
+      - {id: why, label: What they did, type: textarea}
+  - key: prelim.abstract
+    label: Abstract
+    gen: abstract
+    inputs:
+    - {id: abstract, label: Abstract notes, type: textarea, rows: 8, help: "Write last. One paragraph of 150 to 250 words, past tense."}
+    - {id: keywords, label: "Keywords, 3 to 5", type: text}
+  - {key: prelim.contents, label: Contents and Lists, auto: true}
+
+- id: ch1
+  label: Chapter 1
+  parts:
+  - key: ch1.background
+    label: Background
+    inputs:
+    - {id: context, label: "Context: the problem area, globally and in the Philippines, with sources", type: textarea, rows: 5, help: "Ang paksa at ang papel ng teknolohiya, sa buong mundo at sa Pilipinas, kasama ang mga sanggunian."}
+    - {id: situation, label: "Current situation at the locale: how, who, how often, with evidence", type: textarea, rows: 5, help: "Paano ito ginagawa ngayon sa inyong locale, sino ang gumagawa, gaano kadalas, at ano ang patunay."}
+    - {id: problems, label: Specific problems encountered, type: textarea, rows: 4, help: "Anong mga tiyak na problema ang nararanasan?"}
+    - {id: gap, label: Why existing solutions fall short at your locale, type: textarea, rows: 3, help: "Bakit hindi sapat ang mga kasalukuyang solusyon sa inyong locale?"}
+    - {id: solution, label: "Proposed solution and who benefits", type: textarea, rows: 3, help: "Ano ang iminumungkahing sistema at sino ang makikinabang?"}
+    - {id: alignment, label: "Alignment with your class research agenda and DepEd Order No. 39, s. 2016", type: textarea, rows: 2, help: "Paano ito tumutugma sa research agenda ng klase at sa DepEd Order No. 39, s. 2016?"}
+  - key: ch1.sop
+    label: Statement of the Problem
+    gen: sop
+    auto_build: true
+    inputs:
+    - id: questions
+      label: Research questions
+      type: repeater
+      add: Add question
+      default_factory: research_questions
+      fields:
+      - {id: question, label: Question, type: textarea}
+      - {id: subitems, label: "Sub-items, one per line (optional)", type: textarea}
+      - {id: rq_id, type: hidden}
+  - {key: ch1.objectives, label: Objectives, gen: objectives, help: "Each objective restates a research question and starts with an action verb. Build this part after the Statement of the Problem.", inputs: [{id: objectives, label: "Specific objectives, one per line, matching your questions in order", type: textarea, rows: 8}]}
+  - {key: ch1.hypothesis, label: Hypothesis, gen: hypothesis, optional: true, auto_build: true, inputs: [{id: alpha, label: Level of significance, type: text, default: "0.05"}]}
+  - key: ch1.framework
+    label: Conceptual Framework
+    inputs:
+    - {id: input, label: "Input: knowledge, software, and hardware requirements", type: textarea, rows: 4}
+    - {id: process, label: "Process: phases of your model and evaluation", type: textarea, rows: 4}
+    - {id: output, label: "Output: the developed and evaluated system", type: textarea, rows: 2}
+  - key: ch1.scope
+    label: Scope and Limitations
+    inputs:
+    - {id: scope, label: "Scope: modules, roles, platform, locale, respondents, school year", type: textarea, rows: 6}
+    - {id: limits, label: "Limitations: what the system will not do, and constraints", type: textarea, rows: 5}
+  - key: ch1.significance
+    label: Significance
+    inputs:
+    - id: beneficiaries
+      label: Beneficiaries, most direct first
+      type: repeater
+      add: Add beneficiary
+      lead_field: name
+      default_rows: [{name: End-Users}, {name: School Administration}, {name: Researchers}, {name: Future Researchers}]
+      fields:
+      - {id: name, label: Beneficiary, type: text}
+      - {id: benefit, label: How the system will specifically help them, type: textarea}
+  - key: ch1.terms
+    label: Definition of Terms
+    gen: terms
+    inputs:
+    - id: terms
+      label: Terms
+      type: repeater
+      add: Add term
+      fields:
+      - {id: term, label: Term, type: text}
+      - {id: definition, label: How the term is used in your study, type: textarea}
+
+- id: ch2
+  label: Chapter 2
+  parts:
+  - key: ch2.sources
+    label: Source Library
+    no_output: true
+    help: Add every source you actually read. Citations and the reference list come from here. Aim for at least 15 credible sources.
+    inputs:
+    - id: sources
+      label: Sources
+      type: repeater
+      add: Add source
+      fields:
+      - {id: authors, label: "Authors, as Surname, A. A.; Surname, B. B.", type: text}
+      - {id: year, label: Year, type: text}
+      - {id: title, label: Title, type: text}
+      - {id: container, label: "Journal, publisher, school, or website", type: text}
+      - {id: volume, label: Volume, type: text}
+      - {id: issue, label: Issue, type: text}
+      - {id: pages, label: Pages, type: text}
+      - {id: link, label: DOI or URL, type: text}
+      - {id: type, label: Type, type: select, options: [Journal article, Book, Thesis, Website]}
+      - {id: origin, label: Origin, type: select, options: [Foreign, Local]}
+      - {id: notes, label: Your notes on what this source says, type: textarea}
+      - {id: used_for, type: hidden}
+  - key: ch2.literature
+    label: Related Literature
+    inputs:
+    - id: topics
+      label: Topics
+      type: repeater
+      add: Add topic
+      heading_field: topic
+      fields:
+      - {id: topic, label: Topic, type: text}
+      - {id: review, label: "What your sources say, with citations (Author, Year)", type: textarea, rows: 6}
+  - key: ch2.studies
+    label: Related Studies
+    gen: studies
+    inputs:
+    - {id: foreign, label: "Foreign studies: author and year, purpose, method, findings, relation to your study", type: textarea, rows: 8}
+    - {id: local, label: "Local studies: author and year, purpose, method, findings, relation to your study", type: textarea, rows: 8}
+  - key: ch2.systems
+    label: Related Systems
+    inputs:
+    - id: systems
+      label: Existing systems, 3 to 5
+      type: repeater
+      add: Add system
+      lead_field: name
+      fields:
+      - {id: name, label: System, type: text}
+      - {id: review, label: "Description, main features, strengths, limitations", type: textarea, rows: 4}
+  - key: ch2.synthesis
+    label: Synthesis and Gap
+    gen: synthesis
+    inputs:
+    - {id: synthesis, label: "Common findings, the gap, and how your system fills it", type: textarea, rows: 7}
+    - {id: system_a, label: Related system A, type: text}
+    - {id: system_b, label: Related system B, type: text}
+    - {id: system_c, label: Related system C, type: text}
+    - id: matrix
+      label: Feature comparison, Yes or No
+      type: grid
+      add: Add feature
+      columns: [{id: feature, label: Feature, wide: true}, {id: a, label: A}, {id: b, label: B}, {id: c, label: C}, {id: own, label: Yours}]
+
+- id: ch3
+  label: Chapter 3
+  parts:
+  - {key: ch3.design, label: Research Design, inputs: [{id: design, label: "Design used, its source, and why it fits", type: textarea, rows: 6, default: ""}]}
+  - key: ch3.method.overview
+    label: Methodology Overview
+    inputs:
+    - {id: model, label: "Your model, its source, and why you chose it", type: textarea, rows: 6}
+  - {key: ch3.method.phase1, label: Phase 1 Requirements, gen: phase, phase_title: "Phase 1: Requirements Planning and Analysis", inputs: [{id: text, label: "Interviews, observation, records reviewed, functional and non-functional requirements, roles", type: textarea, rows: 8}]}
+  - {key: ch3.method.phase2, label: Phase 2 Design, gen: phase, phase_title: "Phase 2: System Design", inputs: [{id: text, label: Design activities and tools used, type: textarea, rows: 7}]}
+  - {key: ch3.method.phase3, label: Phase 3 Development, gen: phase, phase_title: "Phase 3: Development (Coding)", inputs: [{id: text, label: "Languages, frameworks, database, IDE, version control, build order, libraries, any AI assistance", type: textarea, rows: 8}]}
+  - {key: ch3.method.phase4, label: Phase 4 Testing, gen: phase, phase_title: "Phase 4: Testing", inputs: [{id: text, label: "Testing levels, how test cases were made, how bugs were handled", type: textarea, rows: 7}]}
+  - {key: ch3.method.phase5, label: Phase 5 Deployment, gen: phase, phase_title: "Phase 5: Deployment and Evaluation", inputs: [{id: text, label: "How the system was installed, how users were oriented, how evaluation followed", type: textarea, rows: 7}]}
+  - key: ch3.requirements
+    label: System Requirements
+    gen: requirements
+    inputs:
+    - {id: intro, label: Brief explanation of the tables, type: textarea, rows: 3}
+    - id: hardware
+      label: Hardware
+      type: grid
+      add: Add component
+      default_rows: [{component: Processor}, {component: Memory (RAM)}, {component: Storage}, {component: Display / Device}, {component: Network}]
+      columns: [{id: component, label: Component}, {id: used, label: Used in development}, {id: minimum, label: Minimum for users}]
+    - id: software
+      label: Software, with exact versions
+      type: grid
+      add: Add software
+      columns: [{id: software, label: Software}, {id: purpose, label: Purpose, wide: true}, {id: version, label: Version}]
+  - {key: ch3.locale, label: Locale, inputs: [{id: locale, label: "Where the system was developed, deployed, and evaluated", type: textarea, rows: 6}]}
+  - key: ch3.population
+    label: Population and Respondents
+    gen: population
+    inputs:
+    - {id: text, label: "Population, the two respondent groups, and their qualifications", type: textarea, rows: 6}
+    - id: groups
+      label: Respondent groups
+      type: grid
+      add: Add group
+      default_rows: [{group: IT Experts}, {group: "End-Users"}]
+      columns: [{id: group, label: Group, wide: true}, {id: population, label: Population (N)}, {id: sample, label: Sample (n)}]
+  - key: ch3.sampling
+    label: Sampling
+    gen: sampling
+    inputs:
+    - {id: text, label: "Technique for each group, selection criteria, and source", type: textarea, rows: 6}
+    - {id: slovin_population, label: "Slovin's formula: population (optional)", type: text}
+    - {id: slovin_margin, label: Margin of error, type: text, default: "0.05"}
+  - key: ch3.instrument
+    label: Research Instrument
+    gen: instrument
+    pilot: true
+    inputs:
+    - {id: text, label: "Description of the questionnaire, validation, and reliability", type: textarea, rows: 6}
+    - {id: alpha, label: "Cronbach's alpha from pilot testing (optional)", type: text, help: "Import your pilot responses above to compute this."}
+    - id: indicators
+      label: Evaluation indicators, 3 to 5 per characteristic
+      type: grid
+      add: Add indicator
+      columns: [{id: characteristic, label: Characteristic, choices: iso}, {id: indicator, label: Indicator, wide: true}]
+  - key: ch3.gathering
+    label: Data Gathering
+    gen: numbered
+    inputs:
+    - {id: items, label: "Steps in order, one per line", type: textarea, rows: 10, default_factory: gathering_steps}
+  - {key: ch3.statistics, label: Statistical Treatment, gen: statistics, auto_build: true, inputs: [{id: software, label: "Statistical software used", type: text, placeholder: Microsoft Excel}]}
+  - {key: ch3.ethics, label: Ethics, inputs: [{id: consent, label: "Consent, assent, voluntary participation, right to withdraw", type: textarea, rows: 5}, {id: data, label: "How personal data were protected (RA 10173) and use of dummy data", type: textarea, rows: 4}, {id: credits, label: "Credit for sources and libraries, and disclosure of AI assistance", type: textarea, rows: 3}]}
+
+- id: ch4
+  label: Chapter 4
+  parts:
+  - key: ch4.problems
+    label: Current Problems
+    gen: problems
+    inputs:
+    - {id: findings, label: What you actually found during requirements gathering, type: textarea, rows: 6}
+    - id: mapping
+      label: Problems and the features that address them
+      type: grid
+      add: Add problem
+      columns: [{id: problem, label: Problem identified, wide: true}, {id: feature, label: Feature or module, wide: true}]
+  - {key: ch4.design.architecture, label: Architecture, gen: subheading, subheading: System Architecture, inputs: [{id: text, label: "How users, interface, server, and database work together", type: textarea, rows: 6}]}
+  - {key: ch4.design.usecase, label: Use Case or DFD, gen: subheading, subheading: Use Case Diagram / Data Flow Diagram, inputs: [{id: text, label: Users of the system and the processes they perform, type: textarea, rows: 6}]}
+  - {key: ch4.design.database, label: Database, gen: subheading, subheading: Database Design, inputs: [{id: text, label: Tables and their relationships, type: textarea, rows: 6}]}
+  - key: ch4.design.modules
+    label: Modules and UI
+    gen: subheading
+    subheading: System Modules and User Interface
+    inputs:
+    - id: screens
+      label: Screens
+      type: repeater
+      add: Add screen
+      lead_field: name
+      fields:
+      - {id: name, label: Screen name, type: text}
+      - {id: description, label: "Its purpose, who uses it, and what they can do", type: textarea}
+  - key: ch4.testing
+    label: System Testing
+    gen: testing
+    inputs:
+    - {id: text, label: "Bugs found and how they were fixed", type: textarea, rows: 5}
+    - id: cases
+      label: Test cases
+      type: grid
+      add: Add test case
+      columns: [{id: id, label: ID}, {id: module, label: Module}, {id: scenario, label: Scenario, wide: true}, {id: expected, label: Expected, wide: true}, {id: actual, label: Actual, wide: true}, {id: status, label: Status, choices: [Pass, Fail]}]
+  - key: ch4.acceptability
+    label: Acceptability
+    gen: acceptability
+    dataset: evaluation
+    inputs:
+    - {id: text, label: "Discussion: highest, lowest, overall, meaning, and support from literature", type: textarea, rows: 7}
+    - id: scores
+      label: Weighted means
+      type: grid
+      fixed_rows: true
+      default_factory: iso_rows
+      columns: [{id: characteristic, label: Characteristic, readonly: true, wide: true}, {id: experts, label: IT experts}, {id: users, label: End-users}]
+  - key: ch4.difference
+    label: Significant Difference
+    gen: difference
+    optional: true
+    inputs:
+    - {id: text, label: Discussion of the result, type: textarea, rows: 5}
+    - {id: experts_mean, label: IT experts mean, type: text}
+    - {id: experts_sd, label: IT experts SD, type: text}
+    - {id: users_mean, label: End-users mean, type: text}
+    - {id: users_sd, label: End-users SD, type: text}
+    - {id: t, label: t-value, type: text}
+    - {id: p, label: p-value, type: text}
+  - {key: ch4.enhancements, label: Enhancements, inputs: [{id: text, label: Enhancements based on respondents' comments and the lowest-rated characteristics, type: textarea, rows: 7}]}
+
+- id: ch5
+  label: Chapter 5
+  parts:
+  - {key: ch5.summary, label: Summary of Findings, gen: summary, inputs: [{id: intro, label: "Short restatement of purpose, design, and respondents", type: textarea, rows: 4}, {id: items, label: "Findings, one per line, in research-question order", type: textarea, rows: 8}]}
+  - {key: ch5.conclusions, label: Conclusions, gen: numbered, inputs: [{id: items, label: "Conclusions, one per line, one for each finding", type: textarea, rows: 8}]}
+  - {key: ch5.recommendations, label: Recommendations, gen: numbered, inputs: [{id: items, label: "Recommendations, one per line, each based on a conclusion", type: textarea, rows: 8}]}
+
+- id: refs
+  label: References
+  parts:
+  - {key: refs.list, label: Reference List, gen: references, auto_build: true, inputs: [{id: entries, label: "Extra references not in your Source Library, in APA 7th edition, one per line. Put *asterisks* around text to italicize.", type: textarea, rows: 8}]}
+
+- id: app
+  label: Appendices
+  parts:
+  - {key: app.permission, label: A Permission, inputs: [{id: text, label: Letter text (the signed scan can be added later), type: textarea, rows: 8}]}
+  - {key: app.consent, label: B Consent, inputs: [{id: text, label: Consent and assent form text, type: textarea, rows: 8}]}
+  - {key: app.instrument, label: C Instrument, gen: instrument_appendix, auto_build: true}
+  - {key: app.validation, label: D Validation, inputs: [{id: text, label: Validation certificate text (signed scans can be added later), type: textarea, rows: 5}]}
+  - {key: app.interview, label: E Interview Guide, optional: true, gen: numbered, inputs: [{id: items, label: "Questions, one per line", type: textarea, rows: 10}]}
+  - {key: app.test_cases, label: F Test Cases, gen: test_cases_appendix, auto_build: true}
+  - key: app.gantt
+    label: G Gantt
+    gen: gantt
+    inputs:
+    - id: activities
+      label: Write x in the periods when each activity was done
+      type: grid
+      fixed_rows: true
+      default_factory: gantt_rows
+      columns: [{id: activity, label: Activity, readonly: true, wide: true}, {id: p0, label: "Wk 1–2"}, {id: p1, label: "Wk 3–5"}, {id: p2, label: "Wk 6–10"}, {id: p3, label: "Wk 11–13"}, {id: p4, label: "Wk 14–16"}, {id: p5, label: "Wk 17–18"}, {id: p6, label: "Wk 19–20"}]
+  - {key: app.manual, label: H User Manual, inputs: [{id: text, label: "Instructions for installing, logging in, and using each module", type: textarea, rows: 10}]}
+  - {key: app.code, label: I Source Code, optional: true, inputs: [{id: text, label: Repository link or selected code, type: textarea, rows: 6}]}
+  - {key: app.documentation, label: J Documentation, inputs: [{id: text, label: Notes (photos can be added later), type: textarea, rows: 4}]}
+  - {key: app.editing, label: K Editing Certificate, optional: true, inputs: [{id: text, label: Certificate text (the signed scan can be added later), type: textarea, rows: 4}]}
+  - key: app.revision
+    label: L Revision Matrix
+    gen: revision
+    inputs:
+    - id: rows
+      label: Panel comments
+      type: grid
+      add: Add comment
+      columns: [{id: member, label: Panel member}, {id: comment, label: Comment or suggestion, wide: true}, {id: action, label: Action taken, wide: true}, {id: page, label: Page}]
+  - key: app.cv
+    label: M Curriculum Vitae
+    inputs:
+    - id: people
+      label: One entry per proponent
+      type: repeater
+      add: Add proponent
+      heading_field: name
+      fields:
+      - {id: name, label: Name, type: text}
+      - {id: details, label: "Personal information, education, skills, achievements", type: textarea, rows: 5}
+
+- id: finish
+  label: Finish
+  parts:
+  - {key: finish.check, label: Consistency Check, view: check}
+  - {key: finish.checklist, label: Submission Checklist, view: checklist}
+  - {key: finish.build, label: Generate Full Report, view: build}
+  - key: finish.defense
+    label: Defense Prep
+    no_output: true
+    defense: true
+    inputs:
+    - id: slides
+      label: Slides, about 10 to 15
+      type: repeater
+      add: Add slide
+      heading_field: title
+      fields:
+      - {id: title, label: Slide title, type: text}
+      - {id: bullets, label: "Points, one per line", type: textarea, rows: 4}
+      - {id: notes, label: Speaker notes and who presents, type: textarea, rows: 2}
+    - id: questions
+      label: Likely panel questions
+      type: repeater
+      add: Add question
+      fields:
+      - {id: question, label: Question, type: textarea, rows: 2}
+      - {id: answer, label: Your answer in your own words, type: textarea, rows: 3}
+
+# Files a part accepts. Files stay inside the session and are placed after the part's text.
+# caption_id: one numbered figure. captioned: each file becomes a numbered figure using its caption.
+# Otherwise files are placed without figure numbers, as in the appendices.
+attachments:
+  ch1.framework: {label: IPO diagram, diagram: [ipo], caption_id: ipo, title: Conceptual Framework of the Study, intro: "{{ref:figure:ipo}} presents the conceptual framework of the study."}
+  ch2.systems: {label: Screenshots of related systems, captioned: true, help: "Name the source in each caption."}
+  ch3.method.overview: {label: Development model diagram, diagram: [model], caption_id: model, title: "{model} Model", intro: "{{ref:figure:model}} shows the software development model used in this study."}
+  ch3.method.phase2: {label: UI concept mockups or wireframes, captioned: true, help: "Name the screen in each caption. AI concept images are labeled in the report automatically."}
+  ch3.locale: {label: Location map, captioned: true, help: Optional.}
+  ch4.design.architecture: {label: System architecture diagram, diagram: [architecture], caption_id: architecture, title: "System Architecture of {system}", intro: "{{ref:figure:architecture}} shows the system architecture."}
+  ch4.design.usecase: {label: Use case or data flow diagram, diagram: [usecase, dfd], caption_id: usecase, title: "Use Case Diagram of {system}", titles: {dfd: "Data Flow Diagram of {system}"}, intro: "{{ref:figure:usecase}} shows the users of the system and the processes they perform."}
+  ch4.design.database: {label: Entity relationship diagram, diagram: [erd], caption_id: erd, title: "Entity Relationship Diagram of {system}", intro: "{{ref:figure:erd}} shows the database design."}
+  ch4.design.modules: {label: Screenshots of your actual system, captioned: true, evidence: true, help: "Use real, cropped screenshots. Write the screen name as the caption."}
+  app.permission: {label: "Signed letter (scan, photo, or PDF)", evidence: true}
+  app.consent: {label: Blank consent and assent forms, evidence: true}
+  app.validation: {label: Signed validation certificates, evidence: true}
+  app.manual: {label: Screenshots for the manual, caption_text: true, evidence: true}
+  app.documentation: {label: Documentation photos, caption_text: true, consent: true, evidence: true, help: "Get consent before including photos of respondents."}
+  app.editing: {label: Signed certificate of editing, evidence: true}
+  app.cv: {label: Proponent photos, caption_text: true, evidence: true}

@@ -1,0 +1,102 @@
+# How each part is drafted on the guided path. Merged over spec/ai.yaml.
+# auto_draft: enabled: written from Project Setup and approved parts, then edited and approved by students.
+#   choices: fixed options; suggest_choices: the AI recommends options. A click drafts the part.
+#   show: answers shown beside the draft. fill: a table the AI proposes (field and columns).
+#   table_first: propose the table, let students enter real results, then write.
+#   wait_for: real data that must exist first (field or field.column). repo: uses the analyzed code.
+# auto_rules are added to the part's rules for the model.
+parts:
+  ch2.synthesis:
+    auto_draft: {mode: synthesis, show: [system_a, system_b, system_c, matrix]}
+
+  ch3.design:
+    auto_draft: {enabled: true, suggest_choices: true}
+    context: [ch1.background, ch1.objectives, ch2.synthesis]
+    auto_rules: "Write up the design named in INPUT.choice for this study and explain why it fits, citing only INPUT.sources."
+    options_rule: "Recommend 3 research designs suited to this system development study, such as developmental, descriptive quantitative, or mixed methods."
+  ch3.method.overview:
+    auto_draft: {enabled: true}
+    context: [ch3.design, ch1.objectives]
+    auto_rules: "Explain the software development model named in INPUT.facts.dev_model, why it suits this study. Then name each of these phases and describe its main activities under this model: Requirements Planning and Analysis, System Design, Development, Testing, and Deployment and Evaluation. Write 2 to 3 sentences on each phase from general knowledge of the model. Use no [KULANG] gaps in this part."
+  ch3.method.phase1: &phase
+    auto_draft: {enabled: true}
+    context: [ch3.method.overview, ch1.background, ch1.scope]
+    auto_rules: "Describe the usual activities of this phase under the development model. Use the system's modules and users from INPUT.facts. Mark anything specific to this project that INPUT does not state, such as tools, versions, or names of documents, with a [KULANG: ...] gap."
+  ch3.method.phase2: *phase
+  ch3.method.phase3: *phase
+  ch3.method.phase4: *phase
+  ch3.method.phase5: *phase
+  ch3.sampling:
+    auto_draft: {enabled: true, choices: [Total enumeration, Purposive sampling, Simple random sampling, Stratified random sampling, Convenience sampling], show: [slovin_population, slovin_margin]}
+    context: [ch3.population, ch1.scope]
+    auto_rules: "Write up the sampling technique named in INPUT.choice as applied to the respondent groups in INPUT.context. State the selection criteria as a [KULANG: ...] gap if INPUT does not give them. Do not calculate a sample size."
+  ch3.instrument:
+    auto_draft: {enabled: true, show: [indicators], fill: {field: indicators, columns: [characteristic, indicator]}}
+    context: [ch3.design, ch1.scope, ch1.objectives]
+    auto_rules: "Describe the evaluation questionnaire. In rows, give at least 3 and at most 5 separate rating statements for every characteristic in INPUT.tables, so there are at least 24 rows, each specific to this system and its modules, with characteristic spelled exactly as in that table and indicator as one short statement a respondent can rate. Validation details not in INPUT are [KULANG: ...] gaps."
+  ch3.gathering:
+    auto_draft: {enabled: true}
+    context: [ch3.design, ch3.population, ch3.sampling, ch3.instrument]
+    auto_rules: "One list of the data gathering steps in chronological order: permission, requirements gathering, development and testing, instrument validation, informed consent and assent, system demonstration, questionnaire administration, and analysis. Use {{ref:appendix:permission}} and {{ref:appendix:consent}}."
+  ch3.ethics:
+    auto_draft: {enabled: true}
+    context: [ch3.population, ch3.gathering]
+    auto_rules: "Write the commitments the study follows: informed consent and parental assent for minors, voluntary participation, the right to withdraw, confidentiality under the Data Privacy Act of 2012 (RA 10173), dummy data during development and testing, and credit for all sources, open-source code, and libraries. Do not write about AI use, because a separate statement covers it."
+
+  ch4.problems:
+    auto_draft: {enabled: true, show: [mapping], fill: {field: mapping, columns: [problem, feature]}}
+    context: [ch1.background, ch1.scope, ch3.method.phase1]
+    auto_rules: "Present the problems the students already reported in INPUT.context. In rows, pair each problem with the module of the system that addresses it."
+  ch4.design.architecture: &code
+    auto_draft: {enabled: true, repo: true}
+    context: [ch1.scope, ch3.method.phase2]
+    auto_rules: "Base this only on INPUT.repository, the students' actual code, and describe what is really there. If something cannot be told from it, use a [KULANG: ...] gap."
+  ch4.design.usecase: *code
+  ch4.design.database: *code
+  ch4.design.modules:
+    auto_draft: {enabled: true, repo: true, show: [screens], fill: {field: screens, columns: [name, description]}}
+    context: [ch1.scope, ch3.method.phase2]
+    auto_rules: "Base this only on INPUT.repository. In rows, give each main screen found in the code, with name as the screen and description as its purpose, who uses it, and what they can do."
+  ch4.testing:
+    auto_draft: {enabled: true, table_first: true, show: [cases], wait_for: [cases.status], fill: {field: cases, columns: [id, module, scenario, expected]}}
+    context: [ch1.scope, ch3.method.phase4]
+    auto_rules: "In rows, propose 10 to 15 test cases across the modules, with id such as TC-01, module, scenario, and expected. Never fill in actual results. Discuss the results using only INPUT.tables and INPUT.computed_summary."
+  ch4.acceptability:
+    auto_draft: {enabled: true, show: [scores], wait_for: [scores]}
+    context: [ch3.instrument, ch2.literature]
+  ch4.difference:
+    auto_draft: {enabled: true, show: [experts_mean, experts_sd, users_mean, users_sd, t, p], wait_for: [t, p]}
+    context: [ch4.acceptability, ch1.hypothesis]
+  ch4.enhancements:
+    auto_draft: {enabled: true, show: [text]}
+    context: [ch4.acceptability, ch4.testing]
+    auto_rules: "Propose enhancements based on the lowest-rated characteristics in INPUT.context and any respondent comments in INPUT.inputs.text."
+
+  ch5.summary: {auto_draft: {enabled: true}}
+  ch5.conclusions: {auto_draft: {enabled: true}}
+  ch5.recommendations: {auto_draft: {enabled: true}}
+
+  app.permission:
+    auto_draft: {enabled: true}
+    auto_rules: "Write a formal letter asking the school head, {{PRINCIPAL}}, for permission to conduct the study, using INPUT.facts. Leave signature lines for the students and adviser."
+  app.consent:
+    auto_draft: {enabled: true}
+    context: [ch3.ethics]
+    auto_rules: "Write a blank informed consent and parental assent form, with blank lines for names and signatures."
+  app.validation:
+    auto_draft: {enabled: true}
+    modes: [write]
+    rules: "Write a blank validation certificate for the research instrument, with blank lines for the validator's name, signature, and date."
+  app.interview:
+    auto_draft: {enabled: true}
+    modes: [write, check]
+    context: [ch1.background, ch3.method.phase1]
+    rules: "One list of open-ended interview questions that gather the system's requirements."
+  app.manual:
+    auto_draft: {enabled: true, repo: true}
+    context: [ch1.scope, ch4.design.modules]
+    auto_rules: "Write instructions for installing, logging in, and using each module, based on INPUT.repository and INPUT.context. Add no feature that is not there."
+  app.editing:
+    auto_draft: {enabled: true}
+    modes: [write]
+    rules: "Write a blank certificate of editing, with blank lines for the editor's name, signature, and date."

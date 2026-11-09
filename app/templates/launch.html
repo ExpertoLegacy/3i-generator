@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Research Report Generator</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body class="launch">
+<main class="cover-sheet">
+  <h1>Culminating Research Output</h1>
+  <p class="lede">Answer each part of your report, then generate the complete Word document in your school's format.</p>
+  {% if error %}<p class="problem">{{ error }}</p>{% endif %}
+  <div class="actions">
+    <button class="primary" id="new">Start a new report</button>
+    <button id="open">Open a saved report</button>
+  </div>
+  {% if recent %}
+  <h2>Recent reports</h2>
+  <ul class="recent">
+    {% for path in recent %}<li><button data-path="{{ path }}">{{ path.split('\\')[-1].rsplit('.', 1)[0] }}<small>{{ path }}</small></button></li>{% endfor %}
+  </ul>
+  {% endif %}
+  <p class="privacy">Your report and attachments stay on this computer. Anyone with the saved file can read it, including consent forms and photos, so keep it on a device you trust and delete it when you no longer need it. <a href="/guide">Read the student guide</a> or <a href="/check-computer">check this computer</a>.</p>
+  <p class="problem" id="message" role="alert" hidden></p>
+  <div class="actions" id="safety"></div>
+</main>
+<script>
+async function act(url, body) {
+  const response = await fetch(url, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body || {})});
+  const data = await response.json();
+  if (data.go) location.href = data.go;
+  else if (data.message) { const m = document.getElementById("message"); m.textContent = data.message; m.hidden = false; }
+  const list = document.getElementById("safety");
+  list.replaceChildren(...(data.safety || []).map((copy) => {
+    const button = document.createElement("button");
+    button.textContent = `Open the safety copy from ${copy.when}`;
+    button.onclick = () => act("/api/session/recover", {path: copy.path});
+    return button;
+  }));
+}
+document.getElementById("new").onclick = () => act("/api/session/new");
+document.getElementById("open").onclick = () => act("/api/session/open");
+document.querySelectorAll("[data-path]").forEach(b => b.onclick = () => act("/api/session/open", {path: b.dataset.path}));
+</script>
+</body>
+</html>

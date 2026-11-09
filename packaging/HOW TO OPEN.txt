@@ -1,0 +1,32 @@
+RESEARCH REPORT GENERATOR
+
+No installation is needed.
+
+1. Copy this whole folder to your computer, for example to Documents.
+   Keep everything together. The app needs the _internal folder beside it.
+
+2. Double-click ResearchReportGenerator.exe.
+   The first start can take up to a minute. Later starts are faster.
+
+3. On the first screen, choose "check this computer" to see whether anything needs attention.
+
+
+IF WINDOWS SAYS IT PROTECTED YOUR PC
+
+The app is not yet code-signed, so Windows does not recognize its publisher.
+Choose "More info", then "Run anyway".
+
+Do this only for a copy you received directly from your teacher.
+
+
+IF YOUR ANTIVIRUS REMOVES THE APP
+
+Do not turn your antivirus off. Tell your teacher, who can check the copy and report
+the false alarm. Compare the file's fingerprint with SHA256.txt beside the ZIP file.
+
+
+YOUR WORK
+
+Each report is saved as one .rrg file wherever you choose. Keep that file safe.
+Deleting this folder does not delete your reports.
+The full guide is inside the app, under File, then Student guide.

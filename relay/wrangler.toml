@@ -1,0 +1,36 @@
+# Deployed once by the project owner. relay/deploy.ps1 fills in database_id.
+name = "research-report-relay"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+[ai]
+binding = "AI"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "rrg_relay"
+database_id = "c416328b-a37e-4bc8-a148-49aa5664e311"
+migrations_dir = "migrations"
+
+[vars]
+TEXT_MODEL = "@cf/google/gemma-4-26b-a4b-it"
+INSTALL_DAILY_NEURONS = "2500"
+OVERALL_DAILY_NEURONS = "9500"
+# To announce a release, set both, then deploy. Students see a notice in the app.
+LATEST_APP_VERSION = "1.0.0"
+DOWNLOAD_URL = ""
+IMAGE_MODEL = "@cf/black-forest-labs/flux-1-schnell"
+IMAGE_NEURONS = "60"
+NEURONS_PER_MILLION_INPUT = "9091"
+NEURONS_PER_MILLION_OUTPUT = "27273"
+IP_REQUESTS_PER_MINUTE = "60"
+IP_REGISTRATIONS_PER_DAY = "300"
+
+# Content logging stays off. The relay never writes prompts or responses anywhere.
+[observability]
+enabled = false
+
+# Removes old counters once a day.
+[triggers]
+crons = ["17 3 * * *"]

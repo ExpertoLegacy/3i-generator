@@ -1,0 +1,419 @@
+{
+  "general.about": {
+    "guidelines": [
+      "Every part of the paper has a heading (keep these) and a shaded GUIDELINES box (delete these before submission).",
+      "Text inside brackets and in gray italics, such as [Write the background here.], is a placeholder. Replace it with your own writing and change the font to regular black.",
+      "Parts marked (Optional) are included only if they apply to your study. Ask your research adviser before removing any required part.",
+      "Each chapter starts with a Curriculum Link box showing which learning area of the Inquiries, Investigations and Immersion curriculum guide it satisfies and the expected learner’s output.",
+      "After deleting the guide boxes, right-click the Table of Contents and choose Update Field → Update entire table."
+    ]
+  },
+  "general.format": {
+    "guidelines": [
+      "Paper: A4. Margins: 1.5 inches left (for binding); 1 inch top, right, and bottom. These are already set in this template.",
+      "Font: Bookman Old Style, 12 pt for body text. Chapter titles are bold, all caps, 14 pt, and centered. Section headings are bold and flush left.",
+      "Spacing: 1.5 lines, justified, with a 0.5-inch first-line indent. Use the spacing your adviser requires if it is different.",
+      "Page numbers: upper-right corner. Preliminary pages use lowercase Roman numerals (ii, iii…). Chapter 1 starts at Arabic numeral 1. This is already set up.",
+      "Tables and figures: number them in order (Table 1, Table 2…; Figure 1, Figure 2…). Put the table label and title above the table and the figure label and title below the figure. Mention every table and figure in the text before it appears.",
+      "Write in formal academic English. Use the third person (“the researchers”), not “I” or “we.”",
+      "Tense: a proposal uses the future tense for methods (“will be developed”). The final report uses the past tense (“was developed,” “revealed”).",
+      "Cite all sources using the APA 7th edition format. Every in-text citation must be listed in the References, and every entry in the References must be cited in the text.",
+      "Paraphrase, don’t copy. Copied text, code, or images without attribution is plagiarism. Credit open-source libraries, templates, and code snippets you used.",
+      "If you used AI tools (for grammar checking or code suggestions, for example), follow your school’s policy and disclose it in Chapter 3. You remain responsible for every line of text and code in your output."
+    ]
+  },
+  "prelim.title": {
+    "guidelines": [
+      "State the name of the system, its type/platform (web-based, mobile, desktop), its purpose, and the locale or users.",
+      "Pattern: [SYSTEM NAME]: A [Platform] [Type of System] for [Users/Office] of [Locale].",
+      "Example: LabTrack: A Web-Based Laboratory Equipment Inventory and Borrowing System for the Science Department of Cabiao Senior High School.",
+      "Keep it within about 20 words, typed in ALL CAPS and bold, arranged in an inverted pyramid on the title page."
+    ]
+  },
+  "prelim.approval": {
+    "guidelines": [
+      "The Approval Sheet certifies that your paper was examined and approved by your adviser and the panel. Change the bracketed parts and leave the signature lines blank. Signatures are collected after the final revisions."
+    ]
+  },
+  "prelim.acknowledgment": {
+    "guidelines": [
+      "Optional but customary. Keep it to one page.",
+      "Thank, in order: your research adviser and panel, the school head, the office or users who allowed you to study their process, the IT experts and end-users who evaluated the system, and your families.",
+      "Keep the tone formal and sincere. Avoid nicknames, jokes, and long personal stories."
+    ]
+  },
+  "prelim.abstract": {
+    "guidelines": [
+      "One paragraph, 150–250 words, past tense, with no citations, tables, or abbreviations that are not explained.",
+      "Include, in order: (1) the problem and purpose of the study; (2) the research design and software development model used; (3) the tools and technologies used; (4) the respondents and instrument (ISO/IEC 25010); (5) key results, such as the overall weighted mean and its interpretation; and (6) the main conclusion and recommendation.",
+      "Write it last, after Chapters 1–5 are final."
+    ]
+  },
+  "prelim.contents": {
+    "guidelines": [
+      "This list is generated automatically from the headings. After you finish editing, right-click the field below and choose Update Field → Update entire table. Do not type the table of contents by hand.",
+      "List every table with its number, title, and page number, in order. Update this list each time you add, remove, or renumber a table.",
+      "List every figure (diagrams, screenshots, charts) with its number, title, and page number, in order."
+    ]
+  },
+  "ch1": {
+    "curriculum_link": [
+      "Learning Areas I and II: Brainstorming for Research Topics; Identifying the Problem and Asking the Question (5 weeks, 20 hours). Expected output: class research agenda, background of the problem, conceptual framework, research hypothesis (if applicable), statement of the problem, definition of terms, importance of the study, and scope and limitations. Your teacher will hold an oral defense of this chapter."
+    ]
+  },
+  "ch1.background": {
+    "guidelines": [
+      "Explain why the system is needed. Move from the general situation to your specific locale and problem. Suggested flow (one or more paragraphs each):",
+      "Context. The problem area and the role of technology or information systems in it, globally and in the Philippines. Support with cited sources.",
+      "Current situation at the locale. How the process is done now (manual, spreadsheet, or old system), who does it, and how often. Use evidence from interviews, observation, or records, such as the number of transactions or time spent.",
+      "Problems encountered. Specific difficulties: delays, errors, lost records, duplicate entries, slow report generation, lack of security.",
+      "Gap. Why existing solutions do not fully address the problem at your locale.",
+      "Proposed solution. The system you will develop, what it will do, and who will benefit. State how the study aligns with your class research agenda and the DepEd Basic Education Research Agenda (DepEd Order No. 39, s. 2016).",
+      "Length: 2–3 pages. Do not start with dictionary definitions. Avoid one-sentence paragraphs."
+    ]
+  },
+  "ch1.sop": {
+    "guidelines": [
+      "Begin with the general problem: “This study aims to design, develop, and evaluate [system name], a [platform] [type of system] for [users] of [locale].”",
+      "Follow with specific research questions that are clear, measurable, and answerable by your data. Each question will have its own section in Chapter 4, in the same order.",
+      "Avoid yes-or-no questions except for the hypothesis-testing question. Adjust the sample questions below to your study."
+    ]
+  },
+  "ch1.objectives": {
+    "guidelines": [
+      "This part is added for system development studies. It restates each research question as a specific objective that starts with an action verb: identify, determine, design, develop, test, evaluate, compare, propose.",
+      "Write one general objective, then specific objectives that match the Statement of the Problem one-to-one."
+    ]
+  },
+  "ch1.hypothesis": {
+    "guidelines": [
+      "Required only if one of your research questions tests a relationship or a difference (such as question 5). Descriptive questions, such as level of acceptability, do not need a hypothesis.",
+      "State it in null form (Ho) and give the level of significance. If your study has no such question, delete this heading and its contents."
+    ]
+  },
+  "ch1.framework": {
+    "guidelines": [
+      "Use the Input-Process-Output (IPO) model, the usual framework for system development studies.",
+      "Input: knowledge requirements (problems in the current process, user requirements, related literature and systems), software requirements (programming language, framework, database), and hardware requirements.",
+      "Process: the phases of your chosen software development model (such as planning, analysis, design, development, testing, and deployment) and the evaluation using ISO/IEC 25010.",
+      "Output: the developed and evaluated [System Name]. You may add a feedback arrow from Output back to Input to show iteration.",
+      "Draw the diagram with shapes in Word, draw.io, or Canva, then explain each box in one or two paragraphs. The Process box must match the methodology in Chapter 3."
+    ]
+  },
+  "ch1.scope": {
+    "guidelines": [
+      "Scope: what the system covers, including its modules and features, user roles (administrator, staff, student), platform (web, Android, desktop), locale, respondents, and school year (S.Y. 2026–2027).",
+      "Limitations: what the system will not do, such as no online payment, local network only, or no SMS notifications. Include constraints such as the number of respondents, devices used in testing, internet connectivity, and the fact that long-term use was not measured.",
+      "Be specific. The panel will check whether your output matches what you promised here."
+    ]
+  },
+  "ch1.significance": {
+    "guidelines": [
+      "This part is the CG’s Importance of the Study. Name each beneficiary in bold, followed by how the system or study will specifically help them.",
+      "Order the beneficiaries from most to least direct: end-users (students, teachers, staff), the office or school administration, the researchers, ICT/TVL learners, and future researchers.",
+      "Write one paragraph for each beneficiary. Avoid generic statements such as “this study will help them a lot.”"
+    ]
+  },
+  "ch1.terms": {
+    "guidelines": [
+      "Define the key terms in your title, research questions, and system, including technical terms such as module, database, framework, user acceptance testing, and ISO/IEC 25010.",
+      "Arrange terms alphabetically. Give the operational definition, meaning how the term is used in your study. Add a conceptual definition with a citation if helpful.",
+      "Format: the term in bold followed by a period, then the definition in one to three sentences."
+    ]
+  },
+  "ch2": {
+    "curriculum_link": [
+      "Learning Area III: Reading on Related Studies (5 weeks, 20 hours). Expected output: list of related literature reviewed and a written review of literature of 8–10 pages. Sources must be selected, cited, and synthesized properly and used according to ethical standards. Your teacher will hold a critiquing session or oral presentation of this review."
+    ],
+    "guidelines": [
+      "Aim for at least 15 credible sources, preferably published within the last 10 years. Use the last 5 years for fast-changing technologies.",
+      "Credible sources: journal articles, conference papers, published theses and dissertations, books, government documents, and official technology documentation. Avoid Wikipedia, anonymous blogs, and websites without an author or date.",
+      "Organize by theme or topic, not by source. Each paragraph should present the idea, cite the source (Author, Year), and explain how it relates to your study.",
+      "Include both foreign and local literature and studies."
+    ]
+  },
+  "ch2.literature": {
+    "guidelines": [
+      "Discuss concepts, theories, and technologies found in books, articles, and documentation. Use subheadings for each topic, for example:",
+      "(a) the problem domain (such as inventory management or attendance monitoring); (b) information systems in schools or organizations; (c) the technologies you will use (programming language, framework, database); (d) your software development model; and (e) software quality and ISO/IEC 25010."
+    ]
+  },
+  "ch2.studies": {
+    "guidelines": [
+      "Review previous research, such as theses and journal articles, that developed or evaluated similar systems.",
+      "For each study, give the author and year, purpose, method (development model, respondents, instrument), key findings, and its relation to your study (similarities and differences)."
+    ]
+  },
+  "ch2.systems": {
+    "guidelines": [
+      "This part is added for system development studies. Describe 3–5 existing systems or applications (commercial, open-source, or developed in other studies) that do something similar to your proposed system.",
+      "For each, give a short description, its main features, its strengths, and its limitations. You may include a screenshot with a proper source citation."
+    ]
+  },
+  "ch2.synthesis": {
+    "guidelines": [
+      "Summarize the common findings of the literature, studies, and systems you reviewed. Then state clearly the gap: what is still missing and how your system addresses it.",
+      "Support the synthesis with a feature comparison matrix, such as the sample table below. Write Yes or No in each cell, then discuss the table in a paragraph."
+    ]
+  },
+  "ch3": {
+    "curriculum_link": [
+      "Learning Area IV: Understanding Ways to Collect Data (3 weeks, 12 hours), plus the data analysis method from Learning Area V. Expected output: research design, population, sampling method, data collection procedure, and a written research methodology. Describe the research design, sample, instrument, and data collection and analysis procedures adequately."
+    ]
+  },
+  "ch3.design": {
+    "guidelines": [
+      "Name the design and define it with a citation. Most system development studies use the developmental research design (designing, developing, and evaluating a product), combined with a descriptive quantitative design to describe the evaluation results.",
+      "Explain why this design fits your study in one paragraph."
+    ]
+  },
+  "ch3.method.overview": {
+    "guidelines": [
+      "Name the software development model you used, such as Agile (Scrum), Waterfall, Rapid Application Development (RAD), Prototyping, Iterative and Incremental, or V-Model. Cite its source and present its diagram as a figure.",
+      "Justify your choice. For example, Agile suits projects where user feedback is gathered repeatedly; Waterfall suits projects with fixed, well-defined requirements.",
+      "Discuss each phase under its own subheading. Rename, add, or merge the sample phases below to match your model. For each phase, state what was done, who was involved, the tools used, and the output of the phase."
+    ]
+  },
+  "ch3.method.phase1": {
+    "guidelines": [
+      "Describe how you gathered requirements: interviews with the office head or users, observation of the current process, and review of forms and records. Put your interview guide in Appendix E.",
+      "Present the functional requirements (“The system shall allow the administrator to…”) and non-functional requirements (speed, security, ease of use). List the user roles and what each role can do."
+    ]
+  },
+  "ch3.method.phase2": {
+    "guidelines": [
+      "Describe how the system was designed and the tools used (draw.io, Figma, Canva). Design outputs include the system architecture, use case diagram or data flow diagram (context diagram and level 0), entity relationship diagram (ERD), system flowchart, and user interface wireframes or mockups.",
+      "To avoid repetition, describe the design activities here and present the final diagrams as results in Chapter 4, which answers the research question on design and development. Follow your adviser if they prefer the diagrams here."
+    ]
+  },
+  "ch3.method.phase3": {
+    "guidelines": [
+      "Describe how the system was built: the programming languages, frameworks, database management system, integrated development environment (IDE), and version control (such as Git and GitHub).",
+      "Explain the order in which the modules were built (per sprint or iteration, if Agile), coding conventions followed, and any open-source libraries used, with proper credit.",
+      "Disclose any use of AI coding assistants here, following your school’s policy."
+    ]
+  },
+  "ch3.method.phase4": {
+    "guidelines": [
+      "Describe the levels of testing done: unit testing (each function or module), integration testing (modules working together), system testing (the whole system), and user acceptance testing (UAT) with actual users.",
+      "Explain how test cases were prepared and how bugs were recorded and fixed. Present the results in Chapter 4 and the complete test cases in Appendix F."
+    ]
+  },
+  "ch3.method.phase5": {
+    "guidelines": [
+      "Describe how the system was installed or hosted at the locale (local server, school computer, web hosting, APK installation), how users were oriented, and how the user manual (Appendix H) was used.",
+      "Explain that the system was then evaluated by the respondents using the instrument described below."
+    ]
+  },
+  "ch3.requirements": {
+    "guidelines": [
+      "Present the hardware and software used to develop the system, and the minimum requirements needed to run it.",
+      "Use specific versions, such as “PHP 8.3” or “MySQL 8.0,” not just “PHP” or “MySQL.” Explain the tables briefly in the text."
+    ]
+  },
+  "ch3.locale": {
+    "guidelines": [
+      "Describe where the system was developed, deployed, and evaluated: the school or office, its location, and the users of the process being improved. You may include a location map as a figure."
+    ]
+  },
+  "ch3.population": {
+    "guidelines": [
+      "Describe the population and the respondents who will evaluate the system. There are usually two groups:",
+      "IT experts, such as ICT teachers, programmers, and IT professionals, who evaluate the technical quality of the system. State their qualifications.",
+      "End-users, such as students, teachers, and staff who will actually use the system.",
+      "Agree with your adviser on the number of respondents. Present them in a table like the one below."
+    ]
+  },
+  "ch3.sampling": {
+    "guidelines": [
+      "Name and explain the sampling technique for each group, with a citation. Purposive sampling is commonly used for IT experts, so state the selection criteria. End-users may be chosen by purposive, convenience, or stratified random sampling.",
+      "If the end-user population is large, compute the sample size using Slovin’s formula: n = N / (1 + Ne²), where n is the sample size, N is the population, and e is the margin of error (such as 0.05)."
+    ]
+  },
+  "ch3.instrument": {
+    "guidelines": [
+      "Describe the evaluation questionnaire based on the ISO/IEC 25010 software product quality model, using a 5-point Likert scale. Typical parts: Part I, respondent profile (optional); Part II, evaluation indicators for each quality characteristic (3–5 statements each); and Part III, comments and suggestions. Put the questionnaire in Appendix C.",
+      "If you adapted an existing questionnaire, cite its source and ask the author’s permission if possible.",
+      "Validity: have the instrument checked by at least three validators, such as an ICT teacher, a research teacher, and a language teacher. Put the validation certificates in Appendix D.",
+      "Reliability (optional): pilot-test the instrument and compute Cronbach’s alpha. A value of 0.70 or higher is generally acceptable.",
+      "Note: most studies use the eight characteristics of the 2011 edition, shown below. The 2023 edition renamed usability as interaction capability and portability as flexibility, and added safety. Use the version your adviser prefers and cite it."
+    ]
+  },
+  "ch3.gathering": {
+    "guidelines": [
+      "Present the steps in chronological order as a numbered list, from securing permission to analyzing the data. Adjust the sample steps below."
+    ]
+  },
+  "ch3.statistics": {
+    "guidelines": [
+      "This is the CG’s data analysis method. Name each statistical tool, give its formula, and state which research question it answers.",
+      "Use spreadsheet or statistical software (Excel, Google Sheets, jamovi, JASP, or SPSS) and name it.",
+      "Delete the tools you did not use."
+    ]
+  },
+  "ch3.ethics": {
+    "guidelines": [
+      "Explain how you protected the respondents and maintained research integrity: informed consent, parental consent and assent for minors, voluntary participation, and the right to withdraw.",
+      "Explain how personal data were kept confidential in compliance with the Data Privacy Act of 2012 (Republic Act No. 10173). Use dummy data, not real personal records, during development and testing.",
+      "State that all sources, open-source code, and libraries were properly credited, and disclose any AI assistance."
+    ]
+  },
+  "ch4": {
+    "curriculum_link": [
+      "Learning Area V: Finding the Answers to the Research Questions (3 weeks, 12 hours). Expected output: interpretation of data and the data analysis method, with data gathered and analyzed honestly using suitable techniques. For this developmental study, the conceptualized framework for qualitative research is replaced by the Presentation of the Developed System and the System Testing Results."
+    ],
+    "guidelines": [
+      "Present the results in the same order as the Statement of the Problem, with one heading per research question.",
+      "For each table or figure, follow this pattern: presentation (introduce the table), analysis (highest, lowest, and overall values), interpretation (what the results mean for the system and users), and support (agree or disagree with literature from Chapter 2, with citations).",
+      "Do not repeat every number in the table. Highlight only the important ones.",
+      "Report the data honestly. Do not change responses or hide failed test cases."
+    ]
+  },
+  "ch4.problems": {
+    "guidelines": [
+      "Answers research question 1. Summarize what you found during requirements gathering, then show how each problem is addressed by a feature or module of the system."
+    ]
+  },
+  "ch4.design": {
+    "guidelines": [
+      "Answers research questions 2 and 3. Present the final design and the developed system.",
+      "Use clear, cropped screenshots. Number every figure and describe each one in a short paragraph covering what the screen is for, who uses it, and what the user can do.",
+      "Do not paste source code here. Put selected code or the repository link in Appendix I."
+    ]
+  },
+  "ch4.testing": {
+    "guidelines": [
+      "Summarize the testing results. Report the number of test cases, how many passed, and the pass rate. Show sample test cases in a table and put the complete list in Appendix F.",
+      "Mention bugs found and how they were fixed before the evaluation."
+    ]
+  },
+  "ch4.acceptability": {
+    "guidelines": [
+      "Answers research question 4. Present the summary table of weighted means for each ISO/IEC 25010 characteristic. You may present a detailed table per characteristic (indicator by indicator) before the summary, or place them in the appendix.",
+      "Sample interpretation: “Table __ shows that the system was rated Highly Acceptable overall (WM = __). Usability obtained the highest mean (WM = __), which implies that…. This agrees with the findings of (Author, Year), who….”"
+    ]
+  },
+  "ch4.difference": {
+    "guidelines": [
+      "Answers research question 5. Include this only if you stated a hypothesis. Report the test used, the computed value, the p-value, the decision on Ho (reject or fail to reject), and its meaning."
+    ]
+  },
+  "ch4.enhancements": {
+    "guidelines": [
+      "Answers research question 6. Based on the respondents’ comments and the lowest-rated characteristics, list the enhancements that can improve the system."
+    ]
+  },
+  "ch5": {
+    "curriculum_link": [
+      "Learning Area VI: Reporting Findings, Drawing Conclusions and Making Recommendations (2 weeks, 8 hours). Expected output: summary of findings, conclusions, recommendations, list of references, and the written research report. Conclusions must be logical, and recommendations must be based on the conclusions."
+    ]
+  },
+  "ch5.summary": {
+    "guidelines": [
+      "Begin with a short paragraph restating the purpose, design, and respondents of the study.",
+      "List the findings numbered in the same order as the research questions. State the key results and values briefly, such as “The system was rated Highly Acceptable (WM = 4.52).”",
+      "Do not add new data or discussion."
+    ]
+  },
+  "ch5.conclusions": {
+    "guidelines": [
+      "Give one conclusion for each finding. A conclusion is a generalization that directly answers a research question. It is not a repetition of the numbers.",
+      "If you tested a hypothesis, state whether Ho was rejected or not."
+    ]
+  },
+  "ch5.recommendations": {
+    "guidelines": [
+      "Each recommendation must come from a conclusion. Make them specific and doable, and address them to the beneficiaries named in the Significance of the Study.",
+      "Include recommendations for adoption (school or office), for users, and for future researchers, such as features to add (a mobile version, SMS or email notifications, cloud hosting, analytics) and a larger or longer evaluation."
+    ]
+  },
+  "refs.list": {
+    "guidelines": [
+      "Follow APA 7th edition. List the entries alphabetically by the author’s surname, double-spaced or 1.5-spaced, with a 0.5-inch hanging indent. The paragraphs below are already formatted.",
+      "Include only sources cited in the paper. Add the DOI or URL when available.",
+      "Common formats are shown below. Replace them with your actual sources."
+    ]
+  },
+  "app": {
+    "guidelines": [
+      "Start each appendix on a new page with its letter and title. Include only the appendices that apply. Reletter them in order if you remove some, and update the references to them in the text."
+    ]
+  },
+  "app.permission": {
+    "guidelines": [
+      "The signed letter addressed to the principal or office head asking permission to conduct the study and deploy the system."
+    ]
+  },
+  "app.consent": {
+    "guidelines": [
+      "Blank copies of the consent form for adult respondents, and the parental consent and assent form for respondents below 18 years old."
+    ]
+  },
+  "app.instrument": {
+    "guidelines": [
+      "The complete questionnaire. A sample format for one characteristic is shown below. Repeat it for every characteristic you evaluated."
+    ]
+  },
+  "app.validation": {
+    "guidelines": [
+      "Signed certificates from the validators who checked the questionnaire."
+    ]
+  },
+  "app.interview": {
+    "guidelines": [
+      "The questions used when interviewing the office head or users about the current process (optional)."
+    ]
+  },
+  "app.test_cases": {
+    "guidelines": [
+      "The complete list of test cases with the actual results and status."
+    ]
+  },
+  "app.gantt": {
+    "guidelines": [
+      "The timeline of the research activities, aligned with the learning areas of the curriculum guide. Shade the weeks when each activity was done."
+    ]
+  },
+  "app.manual": {
+    "guidelines": [
+      "Step-by-step instructions, with screenshots, on how to install, log in, and use each module of the system."
+    ]
+  },
+  "app.code": {
+    "guidelines": [
+      "Selected important parts of the code (not the entire program) or a link or QR code to the project repository. Submit the complete source code in digital form."
+    ]
+  },
+  "app.documentation": {
+    "guidelines": [
+      "Photos of requirements gathering, system demonstration, evaluation, and the oral defense, each with a short caption. Get consent before taking photos of respondents."
+    ]
+  },
+  "app.editing": {
+    "guidelines": [
+      "Signed by the English teacher or editor who checked the grammar of the paper (optional)."
+    ]
+  },
+  "app.revision": {
+    "guidelines": [
+      "Record each panel suggestion from the oral defense and how you addressed it."
+    ]
+  },
+  "app.cv": {
+    "guidelines": [
+      "One page per proponent: photo, personal information, educational background, and skills or achievements related to the study."
+    ]
+  },
+  "finish.defense": {
+    "guidelines": [
+      "Submit the draft written research report for oral presentation (Chapters 1–5, references, and appendices) on or before the date set by your teacher.",
+      "Prepare a slide presentation of about 10–15 slides: title; background and problem; objectives; conceptual framework; methodology; live system demonstration; results; and conclusions and recommendations.",
+      "Test the system on the actual device and venue. Prepare a backup, such as a screen-recorded demo video and an offline copy, in case of internet or hardware problems.",
+      "Every member must understand the whole paper and the system, including the code. Expect questions about how a feature works.",
+      "Assign members to present different parts, but answer questions as a group. Answer honestly. If you don’t know, say so and note the question.",
+      "Assign one member to write down all comments and suggestions. Your teacher will also document the proceedings.",
+      "Revise the paper and the system based on the panel’s suggestions, then fill out the Revision Matrix (Appendix L) for checking and signing.",
+      "Submit the final written research report after the revisions are approved."
+    ]
+  }
+}
