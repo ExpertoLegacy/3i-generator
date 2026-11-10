@@ -207,7 +207,7 @@ def test_approving_topics_searches_fills_the_library_and_drafts(world, searches)
     draft = web.state.session.draft("ch2.literature")
     assert "Inventory management" in draft["html"] and web.state.session.status()["ch2.literature"] == "draft"
     page = client.get("/part/ch2.literature").text
-    assert "Alisin" in page and "https://doi.org/10.1/" in page and "Study 10" in page
+    assert "source-remove" in page and "https://doi.org/10.1/" in page and "Study 10" in page
 
 
 def test_student_edited_topics_are_what_gets_searched(world, searches):  # noqa: F811

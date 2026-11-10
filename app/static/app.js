@@ -17,13 +17,31 @@ async function post(url, body) {
   return response.json();
 }
 
+// Messages from the app are written as "English || Tagalog".
+function bilingualNodes(text) {
+  const [english, translated] = String(text).split(" || ");
+  const nodes = [document.createTextNode(english)];
+  if (translated) {
+    const small = document.createElement("small");
+    small.className = "tl";
+    small.lang = "tl";
+    small.textContent = translated;
+    nodes.push(small);
+  }
+  return nodes;
+}
+
+function ask(question) {
+  return window.confirm(question.replace(" || ", "\n\n"));
+}
+
 function setSaved(text) {
   if (savedLabel) savedLabel.textContent = text;
 }
 
 function toast(message, canOpen) {
   const box = document.getElementById("toast");
-  box.querySelector("span").textContent = message;
+  box.querySelector("span").replaceChildren(...bilingualNodes(message));
   document.getElementById("open-export").hidden = !canOpen;
   box.hidden = false;
   clearTimeout(box.timer);
@@ -80,9 +98,14 @@ function showAiNeeds(reasons) {
   document.getElementById("ai-privacy").hidden = Boolean(reasons.length);
   box.querySelector("ul").replaceChildren(...reasons.map((reason) => {
     const li = document.createElement("li");
-    li.textContent = reason;
+    li.append(...bilingualNodes(reason));
     return li;
   }));
+  const finalStep = document.getElementById("ai-write")?.closest(".step");
+  if (finalStep && !finalStep.classList.contains("done")) {
+    finalStep.classList.toggle("later", Boolean(reasons.length));
+    finalStep.classList.toggle("now", !reasons.length);
+  }
   document.querySelectorAll("[data-needs-answers]").forEach((button) => {
     button.toggleAttribute("data-blocked", Boolean(reasons.length));
   });
@@ -175,7 +198,7 @@ function setup(id, handler) {
 }
 
 setup("generate", async (button) => {
-  if (button.hasAttribute("data-replace") && !window.confirm("Replace the text on this page with a new build? You can restore this version afterward.")) return;
+  if (button.hasAttribute("data-replace") && !ask("Replace the text on this page with a new build? You can restore this version afterward.")) return;
   await flush();
   const result = await post(`/api/part/${partKey}/generate`);
   if (result.ok) location.reload();
@@ -253,7 +276,7 @@ document.querySelectorAll(".file[data-attachment]").forEach((figure) => {
     if (event.target.matches("[data-caption],[data-consent]")) saveAttachment(figure);
   });
   figure.querySelector(".delete-file").addEventListener("click", async () => {
-    if (!window.confirm("Remove this file from your report?")) return;
+    if (!ask("Remove this file from your report?")) return;
     await post(`/api/attachment/${figure.dataset.attachment}/delete`);
     location.reload();
   });
@@ -382,7 +405,11 @@ async function withProgress(button, label, work) {
   const line = document.getElementById("ai-progress");
   const started = Date.now();
   const update = () => {
-    if (line) line.textContent = `${label} (${Math.round((Date.now() - started) / 1000)} seconds). You can keep reading while you wait.`;
+    if (line) {
+      const [english, translated] = label.split(" || ");
+      const seconds = Math.round((Date.now() - started) / 1000);
+      line.replaceChildren(...bilingualNodes(`${english} (${seconds} seconds)${translated ? ` || ${translated}` : ""}`));
+    }
   };
   button.setAttribute("data-working", "");
   document.querySelectorAll("[data-ai]").forEach((b) => { b.disabled = true; });
@@ -404,7 +431,7 @@ async function withProgress(button, label, work) {
 const aiWrite = document.getElementById("ai-write");
 if (aiWrite) {
   aiWrite.addEventListener("click", async () => {
-    if (aiWrite.hasAttribute("data-replace") && !window.confirm("Replace the text on this page with an AI draft? You can restore this version afterward.")) return;
+    if (aiWrite.hasAttribute("data-replace") && !ask("Replace the text on this page with an AI draft? You can restore this version afterward.")) return;
     await flush();
     const result = await withProgress(aiWrite, "AI is drafting this part", () => post(`/api/part/${partKey}/ai/write`));
     if (result.ok) location.reload();
@@ -624,7 +651,7 @@ if (diagramData) {
     location.reload();
   });
   document.getElementById("diagram-start").addEventListener("click", async () => {
-    if (diagram.spec.nodes.length && !window.confirm("Replace this table with one built from your answers?")) return;
+    if (diagram.spec.nodes.length && !ask("Replace this table with one built from your answers?")) return;
     await flush();
     const result = await post(`/api/part/${partKey}/diagram/start`, { kind: diagramKind() });
     if (!result.ok) { toast(result.message); return; }
@@ -636,7 +663,7 @@ if (diagramData) {
   const removeDrawn = document.getElementById("diagram-remove");
   if (removeDrawn) {
     removeDrawn.addEventListener("click", async () => {
-      if (!window.confirm("Remove this diagram from your report? Your table stays here.")) return;
+      if (!ask("Remove this diagram from your report? Your table stays here.")) return;
       await flush();
       await post(`/api/attachment/${removeDrawn.dataset.attachmentId}/delete`);
       location.reload();
@@ -645,7 +672,7 @@ if (diagramData) {
   const aiDiagram = document.getElementById("ai-diagram");
   if (aiDiagram) {
     aiDiagram.addEventListener("click", async () => {
-      if (diagram.spec.nodes.length && !window.confirm("Replace this table with an AI proposal?")) return;
+      if (diagram.spec.nodes.length && !ask("Replace this table with an AI proposal?")) return;
       await flush();
       const result = await withProgress(aiDiagram, "AI is proposing a table", () => post(`/api/part/${partKey}/ai/diagram`, { kind: diagramKind() }));
       if (result.ok) location.reload();
@@ -693,11 +720,12 @@ if (pilotFile) {
 setup("approve-next", async (button) => {
   await flush();
   const result = await post(`/api/part/${partKey}/review`, { reviewed: true });
-  if (result.ok) location.href = button.dataset.next;
+  if (result.ok && button.dataset.next) location.href = button.dataset.next;
+  else if (result.ok) location.reload();
   else toast(result.message);
 });
 setup("skip-part", async () => {
-  if (!window.confirm("Hindi kailangan ang bahaging ito? Aalisin ito sa report, at maibabalik mo ito anumang oras. (Leave this part out of the report? You can bring it back.)")) return;
+  if (!ask("Leave this part out of the report? You can bring it back. || Hindi kailangan ang bahaging ito? Aalisin ito sa report, at maibabalik mo ito anumang oras.")) return;
   await flush();
   await post(`/api/part/${partKey}/skip`, { skip: true });
   location.href = "/";
@@ -745,7 +773,7 @@ async function recommendOptions() {
   if (!list || !list.hasAttribute("data-suggest") || optionsRequested) return;
   optionsRequested = true;
   const line = document.createElement("p");
-  line.textContent = "Inihahanda ang mga mungkahi...";
+  line.textContent = "Preparing suggestions...";
   list.append(line);
   const result = await post(`/api/part/${partKey}/ai/options`);
   if (result.ok) location.reload();
@@ -753,11 +781,11 @@ async function recommendOptions() {
 }
 document.querySelectorAll(".choice").forEach((button) => {
   button.addEventListener("click", async () => {
-    if (document.getElementById("editor") && !window.confirm("Palitan ang kasalukuyang draft? Maibabalik mo ito. (Replace the current draft? You can restore it.)")) return;
+    if (document.getElementById("editor") && !ask("Replace the current draft? You can restore it. || Palitan ang kasalukuyang draft? Maibabalik mo ito.")) return;
     document.querySelector('[data-input="choice"]').value = button.dataset.choice;
     pendingInputs = true;
     await flush();
-    const result = await withProgress(button, "Isinusulat ang draft", () => post(`/api/part/${partKey}/ai/synthesize`));
+    const result = await withProgress(button, "Writing the draft || Isinusulat ang draft", () => post(`/api/part/${partKey}/ai/synthesize`));
     if (result.ok) location.reload();
     else toast(result.message);
   });
@@ -766,7 +794,7 @@ let tableRequested = false;
 async function runTable() {
   const button = document.getElementById("ai-table");
   await flush();
-  const result = await withProgress(button, "Inihahanda ang talahanayan", () => post(`/api/part/${partKey}/ai/synthesize`, { rows_only: true }));
+  const result = await withProgress(button, "Preparing the table || Inihahanda ang talahanayan", () => post(`/api/part/${partKey}/ai/synthesize`, { rows_only: true }));
   if (result.ok) location.reload();
   else toast(result.message);
 }
@@ -784,7 +812,7 @@ let synthesisRequested = false;
 async function runSynthesis() {
   const button = document.getElementById("ai-synthesize");
   await flush();
-  const result = await withProgress(button, "Isinusulat mula sa mga naaprubahang bahagi", () => post(`/api/part/${partKey}/ai/synthesize`));
+  const result = await withProgress(button, "Writing from your approved parts || Isinusulat mula sa mga naaprubahang bahagi", () => post(`/api/part/${partKey}/ai/synthesize`));
   if (result.ok) location.reload();
   else toast(result.message);
 }
@@ -797,7 +825,7 @@ function autoSynthesize() {
 const synthesizeButton = document.getElementById("ai-synthesize");
 if (synthesizeButton) {
   synthesizeButton.addEventListener("click", () => {
-    if (synthesizeButton.hasAttribute("data-replace") && !window.confirm("Palitan ang kasalukuyang draft? Maibabalik mo ito. (Replace the current draft? You can restore it.)")) return;
+    if (synthesizeButton.hasAttribute("data-replace") && !ask("Replace the current draft? You can restore it. || Palitan ang kasalukuyang draft? Maibabalik mo ito.")) return;
     runSynthesis();
   });
 }
@@ -815,7 +843,7 @@ async function recommendTopics() {
   const researchButton = document.getElementById("ai-research");
   if (!area || !area.hasAttribute("data-recommend") || topicsRequested) return;
   topicsRequested = true;
-  const result = await withProgress(researchButton, "Inihahanda ang mga inirerekomendang paksa", () => post(`/api/part/${partKey}/ai/topics`));
+  const result = await withProgress(researchButton, "Preparing recommended topics || Inihahanda ang mga inirerekomendang paksa", () => post(`/api/part/${partKey}/ai/topics`));
   if (result.ok) location.reload();
   else toast(result.message);
 }
@@ -823,29 +851,48 @@ async function recommendTopics() {
 const aiResearch = document.getElementById("ai-research");
 if (aiResearch) {
   aiResearch.addEventListener("click", async () => {
-    if (aiResearch.hasAttribute("data-replace") && !window.confirm("Palitan ang kasalukuyang draft? Maibabalik mo ito. (Replace the current draft? You can restore it.)")) return;
+    if (aiResearch.hasAttribute("data-replace") && !ask("Replace the current draft? You can restore it. || Palitan ang kasalukuyang draft? Maibabalik mo ito.")) return;
     await flush();
-    const result = await withProgress(aiResearch, "Naghahanap ng mga pag-aaral at sumusulat ng draft", () => post(`/api/part/${partKey}/ai/research`));
+    const result = await withProgress(aiResearch, "Finding studies and writing the draft || Naghahanap ng mga pag-aaral at sumusulat ng draft", () => post(`/api/part/${partKey}/ai/research`));
     if (result.ok) location.reload();
     else toast(result.message);
   });
 }
 document.querySelectorAll(".source-remove").forEach((button) => {
   button.addEventListener("click", async () => {
-    if (!window.confirm("Alisin ang sangguniang ito? Ayusin din ang draft kung binanggit ito. (Remove this source? Also fix the draft if it is cited.)")) return;
+    if (!ask("Remove this source? Also fix the draft if it is cited. || Alisin ang sangguniang ito? Ayusin din ang draft kung binanggit ito.")) return;
     await flush();
     await post("/api/sources/remove", { title: button.dataset.title });
     location.reload();
   });
 });
 
+// Finished steps fold away, and a click opens them again
+document.querySelectorAll(".step.done > h3").forEach((title) => {
+  const toggle = () => {
+    const opened = title.parentElement.classList.toggle("open");
+    title.setAttribute("aria-expanded", String(opened));
+  };
+  title.addEventListener("click", toggle);
+  title.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") { event.preventDefault(); toggle(); }
+  });
+});
+
+// A rewritten topic is searched as written, not with the words the AI chose for the old one
+document.addEventListener("input", (event) => {
+  if (event.target.matches('[data-input="research_topics"] [data-field="topic"]')) {
+    event.target.closest(".row").querySelector('[data-field="search"]').value = "";
+  }
+});
+
 // Guided drafting
 const aiGuided = document.getElementById("ai-guided");
 if (aiGuided) {
   aiGuided.addEventListener("click", async () => {
-    if (aiGuided.hasAttribute("data-replace") && !window.confirm("Palitan ang kasalukuyang teksto ng bagong unang draft? Maibabalik mo ito. (Replace the current text? You can restore it.)")) return;
+    if (aiGuided.hasAttribute("data-replace") && !ask("Replace the current text? You can restore it. || Palitan ang kasalukuyang teksto ng bagong unang draft? Maibabalik mo ito.")) return;
     await flush();
-    const result = await withProgress(aiGuided, "Ginagawa ang unang draft", () => post(`/api/part/${partKey}/ai/guided`));
+    const result = await withProgress(aiGuided, "Making the first draft || Ginagawa ang unang draft", () => post(`/api/part/${partKey}/ai/guided`));
     if (result.ok) location.reload();
     else toast(result.message);
   });
@@ -855,25 +902,25 @@ async function searchStudies() {
   const list = document.getElementById("study-results");
   const button = document.getElementById("study-go");
   button.disabled = true;
-  list.replaceChildren(el("li", { textContent: "Naghahanap ng mga pag-aaral..." }));
+  list.replaceChildren(el("li", { textContent: "Searching for studies..." }));
   const result = await post("/api/sources/search", { query: document.getElementById("study-q").value });
   button.disabled = false;
   list.replaceChildren();
   if (!result.ok) { toast(result.message); return; }
-  if (!result.results.length) { list.append(el("li", { textContent: "Walang nakita. Subukan ang ibang salita." })); return; }
+  if (!result.results.length) { list.append(el("li", { textContent: "Nothing found. Try other words." })); return; }
   result.results.forEach((study) => {
-    const add = el("button", { type: "button", textContent: "Idagdag" });
+    const add = el("button", { type: "button", textContent: "Add" });
     add.addEventListener("click", async () => {
       const saved = await post("/api/sources/add", { source: study });
       if (!saved.ok) { toast(saved.message); return; }
       document.getElementById("source-count").textContent = saved.count;
-      add.textContent = "Naidagdag";
+      add.textContent = "Added";
       add.disabled = true;
     });
     const details = el("div", {},
       el("strong", { textContent: `${study.title} (${study.year})` }),
       el("small", { textContent: `${study.authors}. ${study.container}${study.origin === "Local" ? ". Philippines" : ""}` }),
-      el("p", { textContent: study.notes ? `${study.notes.slice(0, 320)}...` : "Walang buod. Basahin muna ang mismong pag-aaral." }));
+      el("p", { textContent: study.notes ? `${study.notes.slice(0, 320)}...` : "No summary available. Read the study itself first." }));
     if (study.link) details.append(el("small", { textContent: study.link }));
     list.append(el("li", {}, details, add));
   });
@@ -921,7 +968,7 @@ if (disclosureBox) {
 
 // Defense Prep
 setup("defense-fill", async () => {
-  if (!window.confirm("Replace your slides and questions with an outline built from your report?")) return;
+  if (!ask("Replace your slides and questions with an outline built from your report?")) return;
   await flush();
   await post("/api/defense/fill");
   location.reload();
@@ -933,7 +980,7 @@ setup("defense-download", async () => {
 const aiDefense = document.getElementById("ai-defense");
 if (aiDefense) {
   aiDefense.addEventListener("click", async () => {
-    if (!window.confirm("Replace your slides and questions with an AI draft?")) return;
+    if (!ask("Replace your slides and questions with an AI draft?")) return;
     await flush();
     const result = await withProgress(aiDefense, "AI is preparing your outline", () => post(`/api/part/${partKey}/ai/defense`));
     if (result.ok) location.reload();

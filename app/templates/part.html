@@ -1,3 +1,14 @@
+{%- macro both(text) -%}<span>{{ text }}</span>{{ text | tl }}{%- endmacro -%}
+
+{%- macro say(text) -%}<p class="say">{{ text }}{{ text | tl }}</p>{%- endmacro -%}
+
+{%- macro step(state, title) -%}
+<li class="step {{ state }}">
+  <h3 {% if state == 'done' %}role="button" tabindex="0" aria-expanded="false"{% endif %}>{{ both(title) }}</h3>
+  <div class="step-body">{{ caller() }}</div>
+</li>
+{%- endmacro -%}
+
 {%- macro cell_input(column, value) -%}
   {%- if column.readonly -%}
     <span class="readonly" data-col="{{ column.id }}" data-readonly>{{ value }}</span>
@@ -13,7 +24,7 @@
   {% for sub in field.fields %}
     {% if sub.type == 'hidden' %}<input type="hidden" data-field="{{ sub.id }}" value="{{ row[sub.id] or '' }}">
     {% else %}
-    <label>{{ sub.label }}
+    <label>{{ sub.label }}{{ sub.label | tl }}
       {% if sub.type == 'textarea' %}<textarea data-field="{{ sub.id }}" rows="{{ sub.rows or 3 }}">{{ row[sub.id] or '' }}</textarea>
       {% elif sub.type == 'select' %}<select data-field="{{ sub.id }}">{% for o in sub.options %}<option {{ 'selected' if o == row[sub.id] }}>{{ o }}</option>{% endfor %}</select>
       {% else %}<input data-field="{{ sub.id }}" value="{{ row[sub.id] or '' }}">{% endif %}
@@ -42,29 +53,32 @@
       {% for row in value or [] %}
       <div class="row guided-q">
         {% for name in ('section', 'question_en', 'question_tl') %}<input type="hidden" data-field="{{ name }}" value="{{ row[name] or '' }}">{% endfor %}
-        <label><strong>{{ row.question_tl }}</strong><small>{{ row.question_en }}</small>
+        <label><strong>{{ row.question_en }}</strong><small class="tl" lang="tl">{{ row.question_tl }}</small>
           <textarea data-field="answer" rows="2">{{ row.answer or '' }}</textarea></label>
       </div>
       {% else %}
-      <p class="help">Lalabas dito ang mga tanong pagkatapos ng Hakbang 1. (Questions appear here after Step 1.)</p>
+      {{ say("Questions appear here after the first draft.") }}
       {% endfor %}
     </div>
   </div>
 {% elif field.type == 'repeater' %}
   <div class="group" data-input="{{ field.id }}" data-kind="repeater">
-    <h3>{{ field.label }}</h3>
+    <h3>{{ field.label }}{{ field.label | tl }}</h3>
     {{ suggest_button(field) }}
     <div class="rows">
       {% set rows = value or [] %}
-      {% for row in rows %}<div class="row">{{ row_fields(field, row) }}</div>{% endfor %}
+      {% for row in rows %}
+        {% if field.collapsed %}<details class="row collapsible" {{ 'open' if not row[field.collapsed] }}><summary>{{ row[field.collapsed] or 'New entry' }}</summary>{{ row_fields(field, row) }}</details>
+        {% else %}<div class="row">{{ row_fields(field, row) }}</div>{% endif %}
+      {% endfor %}
       {% if field.min_rows %}{% for _ in range(field.min_rows - rows|length) %}<div class="row">{{ row_fields(field, {}) }}</div>{% endfor %}{% endif %}
     </div>
-    <template><div class="row">{{ row_fields(field, {}) }}</div></template>
+    <template>{% if field.collapsed %}<details class="row collapsible" open><summary>New entry</summary>{{ row_fields(field, {}) }}</details>{% else %}<div class="row">{{ row_fields(field, {}) }}</div>{% endif %}</template>
     <button type="button" class="add">{{ field.add }}</button>
   </div>
 {% elif field.type == 'grid' %}
   <div class="group">
-    <h3>{{ field.label }}</h3>
+    <h3>{{ field.label }}{{ field.label | tl }}</h3>
     {{ suggest_button(field) }}
     <div class="grid-wrap">
     <table class="grid" data-input="{{ field.id }}" data-kind="grid">
@@ -81,12 +95,12 @@
   </div>
 {% elif field.type == 'checks' %}
   <fieldset data-input="{{ field.id }}" data-kind="checks">
-    <legend>{{ field.label }}</legend>
+    <legend>{{ field.label }}{{ field.label | tl }}</legend>
     {% for option in field.options %}<label class="check"><input type="checkbox" value="{{ option[0] }}" {{ 'checked' if value and option[0] in value }}> {{ option[1] }}</label>{% endfor %}
   </fieldset>
 {% else %}
-  <label for="f-{{ field.id }}">{{ field.label }}</label>
-  {% if field.help %}<p class="help">{{ field.help }}</p>{% endif %}
+  <label for="f-{{ field.id }}">{{ field.label }}{{ field.label | tl }}</label>
+  {% if field.help %}<p class="help">{{ field.help }}{{ field.help | tl }}</p>{% endif %}
   {{ suggest_button(field) }}
   {% if field.type == 'textarea' %}
     <textarea id="f-{{ field.id }}" data-input="{{ field.id }}" data-kind="value" rows="{{ field.rows or 4 }}">{{ value or '' }}</textarea>
@@ -163,7 +177,9 @@
     {% if chapter %}
     <div class="chapter-build">
       <button type="button" class="primary" id="build-chapter" data-tab="{{ chapter.id }}" {{ 'disabled' if not chapter.ready }}>Build {{ tab.label }}</button>
-      <small>{% if not chapter.ready %}{{ chapter.missing }} bahagi pa ang hindi naaprubahan{% elif chapter.built %}Nasa Word master na. I-build muli kung may binago.{% else %}Idagdag sa Word master{% endif %}</small>
+      {% if not chapter.ready %}<small>{{ chapter.missing }} parts still need approval</small><small class="tl" lang="tl">{{ chapter.missing }} {{ "parts still need approval" | tagalog_text }}</small>
+      {% elif chapter.built %}<small>Already in the Word master. Build again after any change.</small>{{ "Already in the Word master. Build again after any change." | tl }}
+      {% else %}<small>Add this chapter to the Word master</small>{{ "Add this chapter to the Word master" | tl }}{% endif %}
       {% if chapter.instrument %}<button type="button" id="download-instrument">Download research instrument</button>{% endif %}
     </div>
     {% endif %}
@@ -174,13 +190,13 @@
     <section class="answers">
       <h1>{{ part.label }}</h1>
       {% if skipped %}
-      <p>Minarkahan ito bilang hindi kailangan, kaya hindi ito kasama sa report. (Marked as not necessary, so it is left out of the report.)</p>
-      <button type="button" id="restore-part" data-unskip>Kailangan pala ito (Needed after all)</button>
+      {{ say("This part is marked as not necessary, so it is left out of the report.") }}
+      <button type="button" id="restore-part" data-unskip>{{ both("Needed after all") }}</button>
       {% else %}
       <div class="locked-panel">
-        <p>Bukas ang bahaging ito kapag naaprubahan na ang <a href="/part/{{ lock.key }}">{{ lock.label }}</a>.</p>
-        <p class="en">This part opens after you approve {{ lock.label }}. Parts are done in order because each one builds on the last.</p>
-        <a class="button-link" href="/part/{{ lock.key }}">Pumunta sa {{ lock.label }}</a>
+        <p>This part opens after you approve <a href="/part/{{ lock.key }}">{{ lock.label }}</a>.</p>
+        {{ say("Parts are done in order because each one builds on the last.") }}
+        <a class="button-link" href="/part/{{ lock.key }}">{{ both("Go to the part to finish") }}</a>
       </div>
       {% endif %}
     </section>
@@ -190,11 +206,11 @@
     <div class="work-column">
     <section class="answers">
       <h1>{{ part.label }}</h1>
-      {% if part.optional %}<button type="button" class="quiet skip-button" id="skip-part">Hindi kailangan (Not necessary)</button>{% endif %}
-      {% if part.help %}<p class="help">{{ part.help }}</p>{% endif %}
+      {% if part.optional %}<button type="button" class="quiet skip-button" id="skip-part">{{ both("Not necessary") }}</button>{% endif %}
+      {% if part.help %}<p class="help">{{ part.help }}{{ part.help | tl }}</p>{% endif %}
       {% if guidance.guidelines or guidance.curriculum_link %}
-      <details class="guide" {{ 'open' if not values }}>
-        <summary>Guidelines from the template</summary>
+      <details class="guide">
+        <summary>{{ both("Guidelines from the template") }}</summary>
         {% for line in guidance.guidelines or [] %}<p>{{ line }}</p>{% endfor %}
         {% if guidance.curriculum_link %}<p class="link">{{ guidance.curriculum_link | join(' ') }}</p>{% endif %}
       </details>
@@ -265,140 +281,120 @@
           {% for field in part.inputs if field.type == 'hidden' %}{{ field_input(field, values[field.id]) }}{% endfor %}
           <ol class="guided-steps">
             {% if ai.repo %}
-            <li>
-              <h3>Ikonekta ang code ng inyong sistema</h3>
-              <p>Babasahin ng app ang inyong code para gawin ang bahaging ito. Hindi binabasa ang mga lihim na file gaya ng .env. (The app reads your code to write this part, and never opens secret files.)</p>
-              {% if repo %}<p class="help">Nakakonekta: <strong>{{ repo.name }}</strong> ({{ repo.files }} files)</p>{% endif %}
-              <div class="inline"><input id="repo-link" placeholder="https://github.com/pangalan/proyekto" aria-label="GitHub link"><button type="button" id="repo-github">Basahin ang GitHub</button><button type="button" id="repo-folder">Pumili ng folder</button></div>
-            </li>
+            {% call step('done' if repo else 'now', "Connect your system's code") %}
+              {{ say("The app reads your code to write this part. It never opens secret files such as .env.") }}
+              {% if repo %}<p class="help">{{ "Connected:" }} <strong>{{ repo.name }}</strong> ({{ repo.files }} files)</p>{% endif %}
+              <div class="inline"><input id="repo-link" placeholder="https://github.com/name/project" aria-label="GitHub link"><button type="button" id="repo-github">{{ both("Read GitHub link") }}</button><button type="button" id="repo-folder">{{ both("Choose a folder") }}</button></div>
+            {% endcall %}
             {% endif %}
             {% if ai.choices or ai.suggest_choices %}
-            <li>
-              <h3>Pumili</h3>
-              <p>Pumili ng isa at isusulat ito ng app. (Choose one and the app writes it up.)</p>
+            {% call step('done' if draft else 'now', "Choose one") %}
+              {{ say("Pick one and the app writes it up.") }}
               <div class="choice-list" id="choice-list" {{ 'data-suggest' if ai.suggest_choices and not choice_options }}>
                 {% for option in choice_options %}
-                <button type="button" class="choice ai-tool {{ 'chosen' if option.name == values.choice }}" data-ai data-choice="{{ option.name }}"><strong>{{ option.name }}</strong>{% if option.why_tl %}<span>{{ option.why_tl }}</span><small>{{ option.why_en }}</small>{% endif %}</button>
+                <button type="button" class="choice ai-tool {{ 'chosen' if option.name == values.choice }}" data-ai data-choice="{{ option.name }}"><strong>{{ option.name }}</strong>{% if option.why_en %}<span>{{ option.why_en }}</span>{% endif %}{% if option.why_tl %}<small class="tl" lang="tl">{{ option.why_tl }}</small>{% endif %}</button>
                 {% endfor %}
               </div>
-            </li>
+            {% endcall %}
             {% endif %}
             {% if ai.table_first %}
-            <li>
-              <h3>Ihanda ang talahanayan</h3>
-              <p>Gagawa ang app ng talahanayan. Ilagay ninyo ang tunay na resulta. (The app prepares the table. You enter the real results.)</p>
-              <button type="button" class="ai-tool" id="ai-table" data-ai {{ 'data-auto' if not values[ai.show[0]] }}>Ihanda ang talahanayan</button>
-            </li>
+            {% call step('done' if values[ai.show[0]] else 'now', "Prepare the table") %}
+              {{ say("The app prepares the table, and you enter the real results.") }}
+              <button type="button" class="ai-tool" id="ai-table" data-ai {{ 'data-auto' if not values[ai.show[0]] }}>{{ both("Prepare the table") }}</button>
+            {% endcall %}
             {% endif %}
             {% if ai.show and (draft or ai.waits) %}
-            <li>
-              <h3>{{ 'Ilagay ang buod ng inyong tunay na datos' if ai.waits else 'Suriin ang mga detalye' }}</h3>
-              <p>{{ 'Ang tunay na resulta lamang ang ilagay. Hindi ito huhulaan ng app.' if ai.waits else 'Baguhin ang kailangang baguhin, at i-update ang talahanayan.' }}</p>
-              <p class="en">{{ 'Enter your actual summarized results. The app never guesses them.' if ai.waits else 'Correct anything that needs it, then update the table.' }}</p>
+            {% call step('now', "Enter your summarized results" if ai.waits else "Check the details") %}
+              {{ say("Enter only your actual results. The app never guesses them." if ai.waits else "Correct anything that needs it, then update the table.") }}
               {% for field in part.inputs if field.id in ai.show %}{{ field_input(field, values[field.id]) }}{% endfor %}
-              {% if draft %}<button type="button" id="refresh-tables">I-update ang talahanayan (Update the table)</button>{% endif %}
-            </li>
+              {% if draft %}<button type="button" id="refresh-tables">{{ both("Update the table") }}</button>{% endif %}
+            {% endcall %}
             {% endif %}
             {% if not ai.choices and not ai.suggest_choices %}
-            <li>
-              <h3>{{ 'Isulat ang ' ~ part.label }}</h3>
-              {% if ai.blocked %}<div class="ai-needs"><ul>{% for reason in ai.blocked %}<li>{{ reason }}</li>{% endfor %}</ul></div>{% endif %}
-              <button type="button" class="ai-tool" id="ai-synthesize" data-ai {{ 'data-blocked' if ai.blocked }} {{ 'data-replace' if draft else ('data-auto' if not ai.waits and not ai.repo and not ai.table_first) }}>{{ 'Gawin muli' if draft else 'Gawin ang draft' }}</button>
-            </li>
+            {% call step('done' if draft else 'now', "Write this part") %}
+              {% if ai.blocked %}<div class="ai-needs"><ul>{% for reason in ai.blocked %}<li>{{ reason | bilingual }}</li>{% endfor %}</ul></div>{% endif %}
+              <button type="button" class="ai-tool" id="ai-synthesize" data-ai {{ 'data-blocked' if ai.blocked }} {{ 'data-replace' if draft else ('data-auto' if not ai.waits and not ai.repo and not ai.table_first) }}>{{ both("Write again" if draft else "Write the draft") }}</button>
+            {% endcall %}
             {% endif %}
             {% if draft %}
-            <li>
-              <h3>Suriin at aprubahan</h3>
-              <p>I-edit ang draft at punan ang mga [KULANG: ...]. Kapag tama na, aprubahan ito. (Edit the draft, fill the marked gaps, then approve.)</p>
-            </li>
+            {% call step('now', "Review and approve") %}
+              {{ say("Edit the draft below and fill in any [KULANG: ...]. Then approve it.") }}
+            {% endcall %}
             {% endif %}
           </ol>
           <details class="guide">
-            <summary>Walang internet? Sagutin dito. (No internet? Answer here.)</summary>
+            <summary>{{ both("No internet? Answer here.") }}</summary>
             {% for field in part.inputs if field.id not in ai.show and field.type != 'hidden' and field.type != 'guided' %}{{ field_input(field, values[field.id]) }}{% endfor %}
-            <button type="button" class="primary" id="generate" {{ 'data-replace' if draft }}>Create draft</button>
+            <button type="button" class="primary" id="generate" {{ 'data-replace' if draft }}>{{ both("Create draft") }}</button>
           </details>
           {% elif ai.auto_research %}
           {% set topics_field = part.inputs | selectattr('id', 'equalto', 'research_topics') | first %}
           <ol class="guided-steps">
-            <li>
-              <h3>Hakbang 1: Aprubahan ang mga paksa</h3>
-              <p>Inirekomenda ng app ang mga paksang ito mula sa inyong naaprubahang Chapter 1. Maaari ninyong baguhin, alisin, o dagdagan ang mga ito.</p>
-              <p class="en">Step 1: These topics come from your approved Chapter 1. Change, remove, or add any, then approve.</p>
+            {% call step('done' if draft else 'now', "Approve the topics") %}
+              {{ say("These come from your approved Chapter 1. Change, remove, or add any you like.") }}
               <div id="topic-area" {{ 'data-recommend' if not values.research_topics }}>
                 {{ field_input(topics_field, values.research_topics) }}
               </div>
-              <button type="button" class="ai-tool" id="ai-research" data-ai {{ 'data-replace' if draft }}>Aprubahan at hanapin ang mga pag-aaral</button>
-              <p class="help">Maghahanap ang app ng totoong pag-aaral online, idadagdag ang mga ito sa Source Library, at isusulat ang draft. (The app finds real studies, adds them to your Source Library, and writes the draft.)</p>
-            </li>
+              <button type="button" class="ai-tool" id="ai-research" data-ai {{ 'data-replace' if draft }}>{{ both("Approve and find studies") }}</button>
+              {{ say("The app finds real studies, adds them to your Source Library, and writes the draft.") }}
+            {% endcall %}
             {% if used_sources %}
-            <li>
-              <h3>Hakbang 2: Suriin ang mga sanggunian</h3>
-              <p>Ito ang mga totoong pag-aaral na ginamit. Buksan at basahin ang mga ito. Alisin ang hindi angkop, at ayusin ang draft kung may tinanggal.</p>
-              <p class="en">Step 2: These are the real studies used. The draft relies on their abstracts, so open and read them. Remove any that do not fit.</p>
+            {% call step('now', "Review the sources and draft") %}
+              {{ say("The draft relies on these abstracts, so open and read them. Remove any that do not fit.") }}
               <ul class="results studies">
                 {% for source in used_sources %}
                 <li><div><strong>{{ source.title }} ({{ source.year }})</strong><small>{{ source.authors }}. {{ source.container }}</small>{% if source.link %}<small>{{ source.link }}</small>{% endif %}</div>
-                <button type="button" class="source-remove" data-title="{{ source.title }}">Alisin</button></li>
+                <button type="button" class="source-remove" data-title="{{ source.title }}">Remove</button></li>
                 {% endfor %}
               </ul>
-            </li>
-            <li>
-              <h3>Hakbang 3: Suriin at aprubahan ang draft</h3>
-              <p>I-edit ang draft sa kanan. Kapag tama na, aprubahan ito. Awtomatiko itong mase-save at maisasama sa inyong report.</p>
-              <p class="en">Step 3: Edit the draft on the right. Approving it saves it and includes it in your report.</p>
-            </li>
+              {{ say("Edit the draft below and fill in any [KULANG: ...]. Then approve it.") }}
+            {% endcall %}
             {% endif %}
           </ol>
           <details class="guide">
-            <summary>Walang internet? Sagutin dito. (No internet? Answer here.)</summary>
+            <summary>{{ both("No internet? Answer here.") }}</summary>
             {% for field in part.inputs if field.id != 'research_topics' %}{{ field_input(field, values[field.id]) }}{% endfor %}
-            <button type="button" class="primary" id="generate" {{ 'data-replace' if draft }}>Create draft</button>
+            <button type="button" class="primary" id="generate" {{ 'data-replace' if draft }}>{{ both("Create draft") }}</button>
           </details>
           {% elif ai.guided %}
           {% set guided_field = part.inputs | selectattr('id', 'equalto', 'answers') | first %}
           {% set terms_field = part.inputs | selectattr('id', 'equalto', 'search_terms') | first %}
-          {% set step = namespace(n=3) %}
+          {% set written = draft and not (draft.ai and draft.ai.first_draft) %}
           <ol class="guided-steps">
-            <li>
-              <h3>Hakbang 1: Gawin ang unang draft</h3>
-              <p>Gagamitin ng app ang inyong Project Setup at ang mga naaprubahang bahagi para buuin ang {{ part.label }}. Ang hindi pa nito alam ay lalagyan ng [KULANG: ...].</p>
-              <p class="en">Step 1: The app builds the full flow from your Project Setup and marks what it does not know yet.</p>
-              {% if ai.setup_gaps %}<div class="ai-needs"><p>Kumpletuhin muna sa Project Setup:</p><ul>{% for gap in ai.setup_gaps %}<li>{{ gap }}</li>{% endfor %}</ul></div>{% endif %}
-              <button type="button" class="ai-tool" id="ai-guided" data-ai {{ 'data-blocked' if ai.setup_gaps }} {{ 'data-replace' if draft }}>Gawin ang unang draft</button>
-            </li>
-            <li>
-              <h3>Hakbang 2: Sagutin ang mga tanong</h3>
-              <p>Sumagot sa Tagalog, Taglish, o English. Ibigay lamang ang totoong impormasyon mula sa inyong locale. Ang app ang magsusulat nito sa pormal na English.</p>
-              <p class="en">Step 2: Answer in Tagalog, Taglish, or English, using only real information from your locale.</p>
+            {% call step('done' if draft else 'now', "Make the first draft") %}
+              {{ say("The app drafts this part from your Project Setup and approved parts. Anything it does not know is marked [KULANG: ...].") }}
+              {% if ai.setup_gaps %}<div class="ai-needs"><p>{{ both("Complete these in Project Setup first:") }}</p><ul>{% for gap in ai.setup_gaps %}<li>{{ gap }}</li>{% endfor %}</ul></div>{% endif %}
+              <button type="button" class="ai-tool" id="ai-guided" data-ai {{ 'data-blocked' if ai.setup_gaps }} {{ 'data-replace' if draft }}>{{ both("Make the first draft") }}</button>
+            {% endcall %}
+            {% call step('later' if not draft else ('done' if written else 'now'), "Answer a few questions") %}
+              {{ say("Use real information from your locale. You can answer in Tagalog, Taglish, or English.") }}
               {{ field_input(guided_field, values.answers) }}
               {{ field_input(terms_field, values.search_terms) }}
-            </li>
+              <div class="ai-needs" id="ai-needs" {{ 'hidden' if not ai.blocked }}><ul>{% for reason in ai.blocked %}<li>{{ reason | bilingual }}</li>{% endfor %}</ul></div>
+            {% endcall %}
             {% if ai.research %}
-            {% set step.n = 4 %}
-            <li>
-              <h3>Hakbang 3: Maghanap ng totoong sanggunian</h3>
-              <p>Maghahanap ang app ng mga tunay na pag-aaral. Basahin ang buod at idagdag lamang ang talagang gagamitin ninyo. Tingnan din ang mismong pag-aaral bago ito banggitin.</p>
-              <p class="en">Step 3: The app searches real published studies. Read each summary and add only those you will use.</p>
-              <div class="inline"><input id="study-q" aria-label="Paksang hahanapin" value="{{ (values.search_terms or '').split('\n')[0] }}"><button type="button" id="study-go">Hanapin</button></div>
+            {% call step('later' if not draft else ('done' if written else 'open'), "Find real studies") %}
+              {{ say("Read each summary and add only the studies you will use.") }}
+              <div class="inline"><input id="study-q" aria-label="Search words" value="{{ (values.search_terms or '').split('\n')[0] }}"><button type="button" id="study-go">{{ both("Search") }}</button></div>
               <div class="term-list" id="term-list"></div>
-              <p class="help">Nasa Source Library: <strong id="source-count">{{ source_count }}</strong></p>
+              <p class="help">{{ "In your Source Library:" }} <strong id="source-count">{{ source_count }}</strong></p>
               <ul id="study-results" class="results studies" data-auto="{{ 'yes' if values.search_terms and (not source_count or part.key.startswith('ch2')) }}"></ul>
-            </li>
+            {% endcall %}
             {% endif %}
-            <li>
-              <h3>Hakbang {{ step.n }}: Isulat ang {{ part.label }}</h3>
-              <p>Isusulat ng app ang {{ part.label }} sa pormal na akademikong English, gamit ang inyong mga sagot at sanggunian. Basahin ito at palitan ang natitirang [KULANG: ...].</p>
-              <p class="en">The app writes {{ part.label }} in formal academic English from your answers and sources.</p>
-              <div class="ai-needs" id="ai-needs" {{ 'hidden' if not ai.blocked }}><ul>{% for reason in ai.blocked %}<li>{{ reason }}</li>{% endfor %}</ul></div>
-              <p class="help" id="ai-privacy" {{ 'hidden' if ai.blocked }}>Hindi ipinapadala sa AI ang mga pangalan, email, at numero ng telepono. (Names, emails, and phone numbers are replaced before sending.)</p>
-              <button type="button" class="ai-tool" id="ai-write" data-ai data-needs-answers {{ 'data-blocked' if ai.blocked }} {{ 'data-replace' if draft }}>Isulat sa akademikong English</button>
-            </li>
+            {% call step('done' if written else ('later' if not draft or ai.blocked else 'now'), "Write the final draft") %}
+              <p class="help" id="ai-privacy" {{ 'hidden' if ai.blocked }}>Names, emails, and phone numbers are hidden before anything is sent to AI.{{ "Names, emails, and phone numbers are hidden before anything is sent to AI." | tl }}</p>
+              <button type="button" class="ai-tool" id="ai-write" data-ai data-needs-answers {{ 'data-blocked' if ai.blocked }} {{ 'data-replace' if draft }}>{{ both("Write it in academic English") }}</button>
+            {% endcall %}
+            {% if written %}
+            {% call step('now', "Review and approve") %}
+              {{ say("Edit the draft below and fill in any [KULANG: ...]. Then approve it.") }}
+            {% endcall %}
+            {% endif %}
           </ol>
           <details class="guide">
-            <summary>Walang internet? Sagutin dito. (No internet? Answer here.)</summary>
+            <summary>{{ both("No internet? Answer here.") }}</summary>
             {% for field in part.inputs if field.id not in ('answers', 'search_terms') %}{{ field_input(field, values[field.id]) }}{% endfor %}
-            <button type="button" class="primary" id="generate" {{ 'data-replace' if draft }}>Create draft</button>
+            <button type="button" class="primary" id="generate" {{ 'data-replace' if draft }}>{{ both("Create draft") }}</button>
           </details>
           {% else %}
           {% for field in part.inputs if field.type not in ('guided', 'hidden') and field.id != 'research_topics' %}{{ field_input(field, values[field.id]) }}{% endfor %}
@@ -424,7 +420,7 @@
         {% if diagram %}
         <section class="diagram" id="diagram" aria-label="{{ part.attach.label }}">
           <h3>Draw the {{ part.attach.label | lower }}</h3>
-          <p class="help">Fill in the table, then draw. This works without internet.</p>
+          {{ say("Fill in the table, then draw. This works without internet.") }}
           {% if diagram.kinds | length > 1 %}
           <label for="diagram-kind">Kind of diagram</label>
           <select id="diagram-kind">{% for id, kind in diagram.kinds.items() %}<option value="{{ id }}" {{ 'selected' if id == diagram.kind }}>{{ kind.name }}</option>{% endfor %}</select>
@@ -470,8 +466,8 @@
         {% endif %}
         {% if part.attach %}
         <section class="files" aria-label="Attachments">
-          <h3>{{ part.attach.label }}</h3>
-          {% if part.attach.help %}<p class="help">{{ part.attach.help }}</p>{% endif %}
+          <h3>{{ part.attach.label }}{{ part.attach.label | tl }}</h3>
+          {% if part.attach.help %}<p class="help">{{ part.attach.help }}{{ part.attach.help | tl }}</p>{% endif %}
           <div class="file-list">
             {% for f in attachments if f.kind != 'diagram' %}
             <figure class="file" data-attachment="{{ f.id }}">
@@ -487,7 +483,7 @@
             {% endfor %}
           </div>
           <input type="file" id="file-add" multiple accept="image/*,.heic,.heif,.pdf" aria-label="Add files">
-          <p class="help">Photos, scans, and PDFs stay on this computer inside your saved report. Each PDF page becomes one image.</p>
+          {{ say("Photos, scans, and PDFs stay on this computer inside your saved report.") }}
         </section>
         {% endif %}
       {% endif %}
@@ -509,7 +505,7 @@
           <label for="note-body">Note</label><textarea id="note-body" rows="2" maxlength="2000"></textarea>
           <button type="button" id="note-add">Add note</button>
         </div>
-        <p class="help">Notes stay in this saved report and are never sent to AI. Open notes must be resolved before the final report.</p>
+        {{ say("Notes stay in this saved report and are never sent to AI.") }}
       </details>
       {% endif %}
 
@@ -522,11 +518,16 @@
     {% if has_editor %}
     <section class="output" aria-label="Generated part">
       <div class="tools">
-        {% if not ai.stepped %}<button class="primary" id="generate" {{ 'data-replace' if draft }}>{{ 'Gawin muli mula sa aking sagot' if draft else 'Create draft' }}</button>{% endif %}
+        {% if not ai.stepped %}<button class="primary" id="generate" {{ 'data-replace' if draft }}>{{ both("Create draft") }}</button>{% endif %}
         {% if ai.write and not ai.stepped %}<button class="ai-tool" id="ai-write" data-ai data-needs-answers {{ 'data-blocked' if ai.blocked }} {{ 'data-replace' if draft }}>Draft with AI</button>{% endif %}
         {% if ai.check and draft %}<button class="ai-tool" id="ai-check" data-ai>Check with AI</button>{% endif %}
-        {% if versions %}<button id="restore">Restore previous version</button>{% endif %}
-        {% if draft %}<button id="download">Download this part</button>{% endif %}
+        {% if versions or draft %}
+        <details class="more">
+          <summary>More</summary>
+          {% if versions %}<button id="restore">Restore previous version</button>{% endif %}
+          {% if draft %}<button id="download">Download this part</button>{% endif %}
+        </details>
+        {% endif %}
       </div>
       {% if ai.configured %}
       <p class="ai-progress" id="ai-progress" role="status" hidden></p>
@@ -535,14 +536,14 @@
         <p>AI can draft this part after you add your own information:</p>
         <ul>{% for reason in ai.blocked %}<li>{{ reason }}</li>{% endfor %}</ul>
       </div>
-      <p class="help" id="ai-privacy" {{ 'hidden' if ai.blocked }}>AI receives your answers with names, emails, and phone numbers replaced. Your files and photos stay on this computer. Puwede kayong sumagot sa Tagalog o Taglish; pormal na English ang isusulat ng app.</p>
+      <p class="help" id="ai-privacy" {{ 'hidden' if ai.blocked }}>AI receives your answers with names, emails, and phone numbers replaced. Your files and photos stay on this computer. You can answer in Tagalog or Taglish. The app writes formal English.{{ "You can answer in Tagalog or Taglish. The app writes formal English." | tl }}</p>
       {% endif %}
       <div class="ai-findings" id="ai-findings" hidden></div>
       {% endif %}
       {% if draft and draft.ai %}
       <div class="ai-note">
-        <p><strong>AI draft.</strong> Read every sentence and compare it with your answers before you mark it as reviewed.</p>
-        {% if draft.ai.first_draft %}<p>Unang draft ito. Sagutin ang mga tanong para mapunan ang mga [KULANG: ...]. (This is a first draft. Your answers fill the marked gaps.)</p>{% endif %}
+        {{ say("AI draft. Read every sentence and compare it with your answers before approving.") }}
+        {% if draft.ai.first_draft %}{{ say("Your answers fill in the marked gaps.") }}{% endif %}
         {% if draft.ai.hidden_contacts %}<p>{{ draft.ai.hidden_contacts }} emails, phone numbers, or LRNs in your answers were hidden from AI. Consider removing them from your report.</p>{% endif %}
         <div id="ai-issues" {{ 'hidden' if not draft.ai.issues }}>
           <p class="ai-label">To confirm or correct:</p>
@@ -567,8 +568,13 @@
         {% endif %}
       </div>
       {% if draft %}
-      <label class="reviewbox"><input type="checkbox" id="reviewed" {{ 'checked' if status == 'reviewed' }}> Nabasa namin ito at tama ang nilalaman (We read this part and it is accurate)</label>
-      {% if next %}<button type="button" class="primary" id="approve-next" data-next="/part/{{ next }}">Aprubahan at magpatuloy (Approve and continue)</button>{% endif %}
+      {% if status == 'reviewed' %}
+      <label class="reviewbox"><input type="checkbox" id="reviewed" checked> <span>Approved. Uncheck to reopen.{{ "Approved. Uncheck to reopen." | tl }}</span></label>
+      {% if next %}<a class="button-link" href="/part/{{ next }}">Next: {{ labels[next] }}</a>{% endif %}
+      {% else %}
+      <button type="button" class="primary approve" id="approve-next" data-next="{{ '/part/' ~ next if next else '' }}">{{ both("Approve and continue") }}</button>
+      {{ say("Approving confirms that you read this part and it is accurate.") }}
+      {% endif %}
       <p class="help">Marks such as ‹table:features› become the correct number in Word. Leave them in place. To change a table, edit your answers and build again.</p>
       {% endif %}
     </section>
@@ -602,7 +608,7 @@
     </div>
     <aside class="master-preview" aria-label="Word master preview">
       <h2>Word master</h2>
-      <div id="master-view"><p class="help">Lalabas dito ang inyong report kapag na-build na ang unang chapter. (Your report appears here after you build a chapter.)</p></div>
+      <div id="master-view">{{ say("Your report appears here after you build a chapter.") }}</div>
     </aside>
   </main>
   {% endif %}

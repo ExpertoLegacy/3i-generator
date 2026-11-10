@@ -96,12 +96,12 @@ tabs:
   - key: ch1.background
     label: Background
     inputs:
-    - {id: context, label: "Context: the problem area, globally and in the Philippines, with sources", type: textarea, rows: 5, help: "Ang paksa at ang papel ng teknolohiya, sa buong mundo at sa Pilipinas, kasama ang mga sanggunian."}
-    - {id: situation, label: "Current situation at the locale: how, who, how often, with evidence", type: textarea, rows: 5, help: "Paano ito ginagawa ngayon sa inyong locale, sino ang gumagawa, gaano kadalas, at ano ang patunay."}
-    - {id: problems, label: Specific problems encountered, type: textarea, rows: 4, help: "Anong mga tiyak na problema ang nararanasan?"}
-    - {id: gap, label: Why existing solutions fall short at your locale, type: textarea, rows: 3, help: "Bakit hindi sapat ang mga kasalukuyang solusyon sa inyong locale?"}
-    - {id: solution, label: "Proposed solution and who benefits", type: textarea, rows: 3, help: "Ano ang iminumungkahing sistema at sino ang makikinabang?"}
-    - {id: alignment, label: "Alignment with your class research agenda and DepEd Order No. 39, s. 2016", type: textarea, rows: 2, help: "Paano ito tumutugma sa research agenda ng klase at sa DepEd Order No. 39, s. 2016?"}
+    - {id: context, label: "Context: the problem area, globally and in the Philippines, with sources", type: textarea, rows: 5}
+    - {id: situation, label: "Current situation at the locale: how, who, how often, with evidence", type: textarea, rows: 5}
+    - {id: problems, label: Specific problems encountered, type: textarea, rows: 4}
+    - {id: gap, label: Why existing solutions fall short at your locale, type: textarea, rows: 3}
+    - {id: solution, label: "Proposed solution and who benefits", type: textarea, rows: 3}
+    - {id: alignment, label: "Alignment with your class research agenda and DepEd Order No. 39, s. 2016", type: textarea, rows: 2}
   - key: ch1.sop
     label: Statement of the Problem
     gen: sop
@@ -164,6 +164,7 @@ tabs:
     - id: sources
       label: Sources
       type: repeater
+      collapsed: title
       add: Add source
       fields:
       - {id: authors, label: "Authors, as Surname, A. A.; Surname, B. B.", type: text}
@@ -423,6 +424,7 @@ tabs:
     - id: slides
       label: Slides, about 10 to 15
       type: repeater
+      collapsed: title
       add: Add slide
       heading_field: title
       fields:
