@@ -134,7 +134,7 @@ def build_facts(session: Session) -> dict:
         "subject": school.get("subject"),
         "subject_upper": (school.get("subject") or "").upper(),
         "research_theme": school.get("research_theme"),
-        "strand_section": people.get("strand_section"),
+        "strand_section": " – ".join(v for v in (people.get("strand") or people.get("strand_section"), people.get("section")) if v),
         "school_name": school.get("school_name"),
         "school_address": school.get("school_address"),
         "title": title.upper(),

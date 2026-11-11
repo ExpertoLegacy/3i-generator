@@ -84,8 +84,8 @@ def world(tmp_path, monkeypatch):
     web.state.settings.data.pop("ai", None)
     web.state.session = Session.create(tmp_path / "group.rrg")
     with TestClient(web.app) as client:
-        client.post("/api/part/setup.school/inputs", json={"adviser": "Erlinda M. Bautista", "principal": "Roberto Y. Salazar", "school_name": "Cabiao Senior High School"})
-        client.post("/api/part/setup.people/inputs", json={"proponents": [{"name": "Maria Clara Dela Cruz"}, {"name": "Jose P. Rizalino Jr."}], "panel_chair": "Teresita Valdez"})
+        client.post("/api/part/setup.school/inputs", json={"adviser": "Erickson N. Glodo", "principal": "Marvin A. Batoy", "school_name": "Cabiao Senior High School"})
+        client.post("/api/part/setup.people/inputs", json={"proponents": [{"name": "Maria Clara Dela Cruz"}, {"name": "Jose P. Rizalino Jr."}], "panel_chair": "Jennymine G. Garcia"})
         client.post("/api/part/setup.system/inputs", json={"system_name": "LabTrack", "platform": "web-based", "locale": "the school"})
         yield client, web, relay
     web.state.session.close()
@@ -191,13 +191,13 @@ def test_one_word_answers_do_not_unlock_ai(world):
 def test_no_personal_data_in_outbound_requests(world):
     client, _web, relay = world
     note = (
-        "Maria Clara Dela Cruz and Ms. Dela Cruz asked Mr. Fernandez Abad, while Erlinda M. Bautista advised. Bautista approved. "
-        "Reach maria.cruz@school.edu.ph or 0917-123-4567 or +63 917 765 4321. Student LRN 123456789012. Teresita Valdez chaired, and Roberto Y. Salazar signed."
+        "Maria Clara Dela Cruz and Ms. Dela Cruz asked Mr. Fernandez Abad, while Erickson N. Glodo advised. Glodo approved. "
+        "Reach maria.cruz@school.edu.ph or 0917-123-4567 or +63 917 765 4321. Student LRN 123456789012. Jennymine G. Garcia chaired, and Marvin A. Batoy signed."
     )
     fill_background(client, situation=note)
     assert client.post("/api/part/ch1.background/ai/write").json()["ok"]
     sent = relay.sent_text()
-    for secret in ("Dela Cruz", "Maria Clara", "Fernandez", "Bautista", "Erlinda", "maria.cruz", "917", "123456789012", "Valdez", "Salazar", "Rizalino"):
+    for secret in ("Dela Cruz", "Maria Clara", "Fernandez", "Glodo", "Erickson", "maria.cruz", "917", "123456789012", "Garcia", "Batoy", "Rizalino"):
         assert secret not in sent, secret
     assert "{{ADVISER}}" in sent and "{{PROPONENT_1}}" in sent and "{{EMAIL_1}}" in sent and "{{LRN_1}}" in sent
 
@@ -208,7 +208,7 @@ def test_names_are_restored_in_the_draft_and_contacts_are_reported(world):
     relay.replies.append({"blocks": [{"type": "paragraph", "lead": "{{ADVISER}}", "text": "{{PROPONENT_1}} met {{PHONE_1}}."}]})
     client.post("/api/part/ch1.background/ai/write")
     draft = web.state.session.draft("ch1.background")
-    assert "Erlinda M. Bautista.</strong> Maria Clara Dela Cruz met 09171234567." in draft["html"]
+    assert "Erickson N. Glodo.</strong> Maria Clara Dela Cruz met 09171234567." in draft["html"]
     assert draft["ai"]["hidden_contacts"] == 1
 
 

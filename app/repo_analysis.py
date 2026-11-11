@@ -53,7 +53,7 @@ def digest(name: str, paths: list[str], read) -> dict:
     """Summarize a project. ``read`` returns a file's text, or an empty string if it cannot be read."""
     paths = sorted(p for p in paths if _usable(p))[:MAX_FILES]
     if not paths:
-        raise RepoError("Walang mababasang code dito. (No readable code was found here.)")
+        raise RepoError("No readable code was found here. || Walang mababasang code dito.")
     counts = Counter(LANGUAGES[Path(p).suffix.lower()] for p in paths if Path(p).suffix.lower() in LANGUAGES)
     sections = [f"PROJECT: {name}", "LANGUAGES: " + ", ".join(f"{k} ({v} files)" for k, v in counts.most_common()), "FILES:\n" + "\n".join(paths[:250])]
 
@@ -83,7 +83,7 @@ def from_zip(name: str, raw: bytes) -> dict:
     try:
         archive = zipfile.ZipFile(io.BytesIO(raw))
     except zipfile.BadZipFile as exc:
-        raise RepoError("Hindi mabasa ang na-download na repository. (The repository could not be read.)") from exc
+        raise RepoError("The repository could not be read. || Hindi mabasa ang na-download na repository.") from exc
     entries = {i.filename.split("/", 1)[1]: i for i in archive.infolist() if not i.is_dir() and "/" in i.filename}
 
     def read(path: str) -> str:
@@ -98,20 +98,20 @@ def from_zip(name: str, raw: bytes) -> dict:
 def from_github(link: str, client: httpx.Client | None = None) -> dict:
     match = GITHUB.match(link.strip())
     if not match:
-        raise RepoError("Gamitin ang link na tulad ng https://github.com/pangalan/proyekto. (Use a link like https://github.com/name/project.)")
+        raise RepoError("Use a link like https://github.com/name/project. || Gumamit ng link na tulad nito.")
     owner, repo = match.groups()
     owned = client is None
     client = client or httpx.Client(transport=net.transport(), timeout=httpx.Timeout(60, connect=10), follow_redirects=True)
     try:
         with client.stream("GET", f"https://codeload.github.com/{owner}/{repo}/zip/HEAD") as response:
             if response.status_code == 404:
-                raise RepoError("Hindi makita ang repository. Dapat ay public ito, o gamitin ang folder sa computer. (Not found. It must be public, or choose the folder instead.)")
+                raise RepoError("Not found. It must be public, or choose the folder instead. || Hindi makita ang repository. Dapat ay public ito, o pumili ng folder.")
             response.raise_for_status()
             data = bytearray()
             for chunk in response.iter_bytes():
                 data += chunk
                 if len(data) > MAX_DOWNLOAD:
-                    raise RepoError("Masyadong malaki ang repository. Gamitin ang folder sa computer. (Too large. Choose the folder on this computer instead.)")
+                    raise RepoError("Too large. Choose the folder on this computer instead. || Masyadong malaki. Pumili ng folder sa computer.")
     except httpx.HTTPError as exc:
         raise RepoError(f"{net.explain(exc)}") from exc
     finally:

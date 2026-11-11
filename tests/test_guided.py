@@ -71,10 +71,10 @@ def test_final_report_stays_blocked_while_gaps_remain(world):  # noqa: F811
 def test_final_writing_waits_for_real_answers(world):  # noqa: F811
     client, _web, relay = world
     setup(client)
-    assert "Hakbang 1" in client.post("/api/part/ch1.background/ai/write").json()["message"]
+    assert "Step 1" in client.post("/api/part/ch1.background/ai/write").json()["message"]
     first_draft(client, relay)
     calls = len(relay.text_bodies())
-    assert "Hakbang 2" in client.post("/api/part/ch1.background/ai/write").json()["message"]
+    assert "Answer at least" in client.post("/api/part/ch1.background/ai/write").json()["message"]
     assert len(relay.text_bodies()) == calls
 
 
@@ -125,16 +125,16 @@ def test_first_draft_failure_changes_nothing(world):  # noqa: F811
 
 def test_no_internet_path_is_still_there(world, monkeypatch):  # noqa: F811
     client, _web, _relay = world
-    assert "Walang internet? Sagutin dito." in client.get("/part/ch1.background").text
+    assert "No internet? Answer here." in client.get("/part/ch1.background").text
     monkeypatch.setenv("RRG_RELAY_URL", "")
     page = client.get("/part/ch1.background").text
-    assert "Create draft" in page and "Hakbang 1" not in page and "Ano ang iminumungkahing sistema" in page
+    assert "Create draft" in page and "guided-steps" not in page and "Ano ang iminumungkahing sistema" in page
 
 
 def test_other_parts_keep_their_normal_page_and_accept_tagalog(world):  # noqa: F811
     client, _web, _relay = world
     page = client.get("/part/ch3.locale").text
-    assert "Hakbang 1" not in page and "Create draft" in page and "Tagalog o Taglish" in page
+    assert "guided-steps" not in page and "Create draft" in page and "Tagalog o Taglish" in page
 
 
 @pytest.mark.parametrize(("text", "value"), [("apatnapu", 40), ("apatnapu't lima", 45), ("tatlong araw", 3), ("labindalawa", 12), ("dalawang daan", 200), ("isang libo", 1000), ("sampung estudyante", 10)])

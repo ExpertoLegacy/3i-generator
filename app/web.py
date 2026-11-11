@@ -19,6 +19,7 @@ from fastapi import Body, FastAPI, Request, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from markupsafe import Markup
 
 from app import computer_check, repo_analysis
 from app.ai_client.client import AIError
@@ -49,6 +50,22 @@ GATING = True
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 app.mount("/static", StaticFiles(directory=str(BASE / "app" / "static")), name="static")
 templates = Jinja2Templates(directory=str(BASE / "app" / "templates"))
+
+
+def tagalog(text) -> Markup | str:
+    """The small Tagalog line that goes under an English label."""
+    translated = spec_module.translations().get(str(text))
+    translated = "" if translated == str(text) else translated
+    return Markup('<small class="tl" lang="tl">{}</small>').format(translated) if translated else ""
+
+
+def bilingual(text) -> Markup:
+    """Show an app message written as 'English || Tagalog'."""
+    english, _, translated = str(text).partition(" || ")
+    return Markup('{}<small class="tl" lang="tl">{}</small>').format(english, translated) if translated else Markup("{}").format(english)
+
+
+templates.env.filters.update(tl=tagalog, bilingual=bilingual, tagalog_text=lambda text: spec_module.translations().get(str(text), ""))
 
 
 class State:
@@ -458,7 +475,7 @@ def build_chapter(tab_id: str):
         return {"ok": False, "message": "This tab has no chapter to build."}
     missing = unfinished(session, tab_id)
     if missing:
-        return {"ok": False, "message": "Aprubahan muna ang lahat ng bahagi. (Approve every part first.) " + ", ".join(missing)}
+        return {"ok": False, "message": "Approve every part first: " + ", ".join(missing) + ". || Aprubahan muna ang lahat ng bahagi."}
     tab = next(t for t in spec_module.tabs() if t["id"] == tab_id)
     for part in tab["parts"]:
         if part.get("auto_build") and part["key"] not in g.disabled_parts(session):
@@ -474,9 +491,9 @@ def build_chapter(tab_id: str):
     target = home / f"{session.path.stem} Master.docx"
     try:
         target.write_bytes(data)
-        return {"ok": True, "message": f"Naidagdag sa Word master. (Added to {target.name}.)"}
+        return {"ok": True, "message": f"Added to {target.name}. || Naidagdag sa Word master."}
     except OSError:
-        return {"ok": True, "message": "Na-update ang preview, pero isara muna ang Word master para ma-save ito. (Close the Word master to save it there.)"}
+        return {"ok": True, "message": "The preview is updated. Close the Word master so it can be saved too. || Na-update ang preview. Isara muna ang Word master para ma-save ito."}
 
 
 @app.get("/api/master-preview")
@@ -491,7 +508,7 @@ def master_preview():
 def download_instrument():
     session = active()
     if unfinished(session, "ch3"):
-        return {"ok": False, "message": "Tapusin muna ang Chapter 3. (Finish Chapter 3 first.)"}
+        return {"ok": False, "message": "Finish Chapter 3 first. || Tapusin muna ang Chapter 3."}
     return write_export(exporter.instrument_document(session), "Research Instrument.docx")
 
 
@@ -516,7 +533,7 @@ def repo_folder():
 
 def store_repo(result: dict) -> dict:
     active().set_meta("repo_digest", json.dumps(result, ensure_ascii=False))
-    return {"ok": True, "message": f"Nabasa ang {result['name']}: {result['files']} files."}
+    return {"ok": True, "message": f"Read {result['name']}: {result['files']} files. || Nabasa na ang code."}
 
 
 @app.post("/api/part/{key}/skip")
@@ -531,7 +548,7 @@ def skip_part(key: str, payload: dict = Body(...)):
 def review_part(key: str, payload: dict = Body(...)):
     session = active()
     if payload.get("reviewed") and "[KULANG" in ((session.draft(key) or {}).get("html") or ""):
-        return {"ok": False, "message": "May natitira pang [KULANG: ...] sa teksto. Punan muna ang mga ito. (Fill in the marked gaps first.)"}
+        return {"ok": False, "message": "Fill in every [KULANG: ...] first. || May natitira pang [KULANG: ...] sa teksto. Punan muna ang mga ito."}
     session.set_reviewed(key, bool(payload.get("reviewed")))
     event = ((session.draft(key) or {}).get("ai") or {}).get("event")
     if event and payload.get("reviewed"):

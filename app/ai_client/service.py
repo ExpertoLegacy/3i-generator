@@ -233,6 +233,11 @@ def blocks_to_html(blocks: list[Block], restore) -> str:
     return html
 
 
+def english_only(reasons: list[str]) -> str:
+    """Join several 'English || Tagalog' reasons into one short English message."""
+    return " ".join(r.split(" || ")[0] for r in reasons)
+
+
 class AIService:
     def __init__(self, settings):
         self.client = RelayClient(settings)
@@ -297,9 +302,9 @@ class AIService:
             if answered >= needed and answers:
                 reasons = [r for r in reasons if "System Profile" in r]
             elif answers:
-                reasons = [f"Sagutin ang kahit {needed} tanong sa Hakbang 2. (Answer at least {needed} questions in Step 2.)"]
+                reasons = [f"Answer at least {needed} questions above. || Sagutin ang kahit {needed} tanong sa itaas."]
             elif not typed_notes:
-                reasons = ["Gawin muna ang unang draft sa Hakbang 1. (Make the first draft in Step 1.)"]
+                reasons = ["Make the first draft in Step 1 first. || Gawin muna ang unang draft sa Step 1."]
         if config.get("auto_research") or config.get("auto_draft"):
             reasons = [r for r in reasons if "System Profile" in r]
         auto_settings = spec_module.auto_config(key)
@@ -319,7 +324,7 @@ class AIService:
                     reasons.append(f"Fill in: {field['label']}.")
             typed = any(str(values.get(name) or "").strip() for name in config.get("requires", []))
             if auto.get("repo") and not session.get_meta("repo_digest") and not typed:
-                reasons.append("Ikonekta muna ang code ng inyong sistema sa itaas. (Connect your system's code above first.)")
+                reasons.append("Connect your system's code above first. || Ikonekta muna ang code ng inyong sistema sa itaas.")
         for other in config.get("requires_parts", []):
             if other not in g.disabled_parts(session) and not session.draft(other):
                 reasons.append(f"Build this part first: {spec_module.part(other)['label']}.")
@@ -527,7 +532,7 @@ class AIService:
             raise AIError("AI drafting is not available for this part.")
         reasons = self.blocked(session, key)
         if reasons:
-            raise AIError("Before AI can draft this part: " + " ".join(reasons))
+            raise AIError("Before AI can draft this part: " + english_only(reasons))
         with self._exclusive():
             payload, offline = self.build_payload(session, key, "write")
             masker = self.masker(session)
@@ -557,7 +562,7 @@ class AIService:
             raise AIError("This is not available here.")
         gaps = self.setup_gaps(session, key)
         if gaps:
-            raise AIError("Kumpletuhin muna ang Project Setup, System Profile. (Complete System Profile first.) " + " ".join(f"{g_}." for g_ in gaps))
+            raise AIError("Complete Project Setup, System Profile first: " + " ".join(f"{g_}." for g_ in gaps) + " || Kumpletuhin muna ang Project Setup.")
         with self._exclusive():
             payload, offline = self.build_payload(session, key, "guided")
             masker = self.masker(session)
@@ -603,10 +608,10 @@ class AIService:
         auto = spec_module.auto_config(key)
         values = g.inputs_for(session, key)
         if (auto.get("choices") or auto.get("suggest_choices")) and not values.get("choice"):
-            raise AIError("Pumili muna ng isa sa mga pagpipilian. (Choose one of the options first.)")
+            raise AIError("Choose one of the options first. || Pumili muna ng isa sa mga pagpipilian.")
         reasons = [] if rows_only else self.blocked(session, key)
         if reasons:
-            raise AIError(" ".join(reasons))
+            raise AIError(english_only(reasons))
         with self._exclusive():
             payload, offline = self.build_payload(session, key, "auto")
             masker = self.masker(session)
@@ -624,7 +629,7 @@ class AIService:
             if rows_only:
                 count = len(g.inputs_for(session, key).get(fill["field"]) or [])
                 if not count:
-                    raise AIError("Hindi nakagawa ng talahanayan. Subukan muli. (The table could not be prepared. Try again.)")
+                    raise AIError("The table could not be prepared. Try again. || Hindi nakagawa ng talahanayan. Subukan muli.")
                 return {"rows": count}
             reply, meta = self._call(session, key, "auto", self._shrink(masker.mask_tree(payload)), use_cache=False)
             if not reply.blocks:
@@ -645,7 +650,7 @@ class AIService:
             return self.auto_write(session, key, rows_only)
         reasons = self.blocked(session, key)
         if reasons:
-            raise AIError(" ".join(reasons))
+            raise AIError(english_only(reasons))
         with self._exclusive():
             payload, _ = self.build_payload(session, key, "synthesis")
             masker = self.masker(session)
@@ -673,7 +678,7 @@ class AIService:
             raise AIError("This is not available here.")
         reasons = self.blocked(session, key)
         if reasons:
-            raise AIError(" ".join(reasons))
+            raise AIError(english_only(reasons))
         with self._exclusive():
             payload, _ = self.build_payload(session, key, "topics")
             masker = self.masker(session)
@@ -690,7 +695,7 @@ class AIService:
             raise AIError("This is not available here.")
         rows = [r for r in g.inputs_for(session, key).get("research_topics") or [] if (r.get("topic") or "").strip()][:MAX_TOPICS]
         if not rows:
-            raise AIError("Maglagay muna ng kahit isang paksa. (Add at least one topic first.)")
+            raise AIError("Add at least one topic first. || Maglagay muna ng kahit isang paksa.")
         found: dict[str, dict] = {}
         try:
             for row in rows:
@@ -701,9 +706,9 @@ class AIService:
                     for study in usable[:config["per_topic"]]:
                         found.setdefault(study["title"].strip().lower(), study)
         except apa.LookupError_ as exc:
-            raise AIError("Hindi makakonekta sa database ng mga pag-aaral. Subukan muli. (The scholarly database could not be reached. Try again.)") from exc
+            raise AIError("The scholarly database could not be reached. Try again. || Hindi makakonekta sa database ng mga pag-aaral. Subukan muli.") from exc
         if len(found) < config["minimum_sources"]:
-            raise AIError(f"{len(found)} na pag-aaral lang ang nakita. Palitan ang mga salitang hahanapin. (Only {len(found)} studies were found. Change the search words.)")
+            raise AIError(f"Only {len(found)} studies were found. Change the search words. || {len(found)} na pag-aaral lang ang nakita. Palitan ang mga paksa.")
         self._add_sources(session, key, list(found.values()))
         return {**self.write(session, key), "sources": len(found)}
 
@@ -729,7 +734,7 @@ class AIService:
             raise AIError("AI diagrams are not available for this part.")
         reasons = self.blocked(session, key)
         if reasons:
-            raise AIError("Before AI can propose this diagram: " + " ".join(reasons))
+            raise AIError("Before AI can propose this diagram: " + english_only(reasons))
         with self._exclusive():
             payload, _ = self.build_payload(session, key, "diagram")
             payload["kind"] = kind
@@ -775,7 +780,7 @@ class AIService:
             raise AIError("This is not available here.")
         reasons = self.blocked(session, key)
         if reasons:
-            raise AIError("Before AI can prepare this: " + " ".join(reasons))
+            raise AIError("Before AI can prepare this: " + english_only(reasons))
         with self._exclusive():
             payload, _ = self.build_payload(session, key, "defense")
             masker = self.masker(session)

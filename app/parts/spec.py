@@ -12,10 +12,10 @@ BASE = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent.parent.pare
 
 
 RESEARCH_TOPICS = {
-    "id": "research_topics", "label": "Mga paksa (Topics)", "type": "repeater", "add": "Magdagdag ng paksa",
+    "id": "research_topics", "label": "Topics", "type": "repeater", "add": "Add a topic",
     "fields": [
-        {"id": "topic", "label": "Paksa (Topic)", "type": "text"},
-        {"id": "search", "label": "Hahanapin sa mga database (Search words, in English)", "type": "text"},
+        {"id": "topic", "label": "Topic", "type": "text"},
+        {"id": "search", "type": "hidden"},  # database words the AI chose; cleared if the student rewrites the topic
     ],
 }
 
@@ -53,6 +53,27 @@ def ai_spec() -> dict:
         merged = data["parts"].setdefault(key, {"modes": ["write", "check"]})
         merged.update(extra)
     return data
+
+
+@lru_cache
+def translations() -> dict:
+    return yaml.safe_load((BASE / "spec" / "translations.yaml").read_text(encoding="utf-8"))
+
+
+@lru_cache
+def fixed_values() -> dict:
+    """Project Setup answers set by the school, which students cannot change."""
+    found: dict = {}
+    for item in all_parts():
+        for field in item["inputs"]:
+            if "fixed" in field:
+                found.setdefault(item["key"], {})[field["id"]] = field["fixed"]
+    return found
+
+
+def with_fixed(key: str, data: dict) -> dict:
+    fixed = fixed_values().get(key)
+    return {**data, **fixed} if fixed else data
 
 
 def auto_config(key: str) -> dict | None:

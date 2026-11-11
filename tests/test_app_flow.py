@@ -118,7 +118,7 @@ def test_typed_session_exports_final_report_without_network(app_client, monkeypa
     assert response["ok"], response
     document = Document(web.state.last_export)
     text = "\n".join("".join(t.text or "" for t in p.iter(qn("w:t"))) for p in document.element.body.iter(qn("w:p")))
-    assert "SAMPLE VALUE" in text and TEXT in text
+    assert "ERICKSON N. GLODO" in text and "JENNYMINE G. GARCIA" in text and TEXT in text
     for banned in ("{{", "[Not yet", "[Missing", "GUIDELINES"):
         assert banned not in text
 
