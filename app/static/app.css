@@ -204,6 +204,9 @@ summary > span { display: inline; }
 summary > .tl { margin-left: 16px; }
 .say { margin: 0 0 8px; max-width: 68ch; }
 
+input.fixed { background: var(--mist); border-color: transparent; color: var(--ink, #1d2b3a); font-weight: 500; cursor: default; }
+input.fixed:focus { outline: 1px dashed var(--line); }
+
 /* One clear step at a time */
 .guided-steps { counter-reset: step; }
 .guided-steps > .step { counter-increment: step; position: relative; border-left: 0; padding: 0 0 12px 40px; margin-bottom: 4px; }

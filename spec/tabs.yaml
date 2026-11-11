@@ -14,14 +14,15 @@ tabs:
     - {id: school_address, label: Address, type: text, default: "Palasinan, Cabiao, Nueva Ecija"}
     - {id: subject, label: Subject, type: text, default: "Inquiries, Investigations and Immersion"}
     - {id: research_theme, label: Research theme, type: text, default: System Software Development}
-    - {id: adviser, label: Research adviser, type: text, default: Erickson N. Glodo}
-    - {id: principal, label: Principal or SHS assistant principal, type: text}
-    - {id: principal_title, label: Position title, type: text, default: SHS Assistant Principal}
+    - {id: adviser, label: Research adviser, type: text, fixed: Erickson N. Glodo}
+    - {id: principal, label: School principal, type: text, fixed: Marvin A. Batoy}
+    - {id: principal_title, label: Position title, type: text, fixed: School Principal III}
   - key: setup.people
     label: Proponents and Panel
     setup: true
     inputs:
-    - {id: strand_section, label: Grade 12 strand and section, type: text, placeholder: Grade 12 – TVL-ICT / Turing}
+    - {id: strand, label: Strand, type: text, fixed: Information and Communications Technology}
+    - {id: section, label: Section (optional), type: text, placeholder: Turing}
     - id: proponents
       label: Proponents
       type: repeater
@@ -29,10 +30,10 @@ tabs:
       add: Add proponent
       fields:
       - {id: name, label: Full name, type: text}
-    - {id: month_year, label: Month and year of submission, type: text, placeholder: March 2027}
-    - {id: panel_chair, label: Panel chairperson, type: text}
-    - {id: panel_member_1, label: Panel member, type: text}
-    - {id: panel_member_2, label: Panel member, type: text}
+    - {id: month_year, label: Month and year of submission, type: text, fixed: November 2026}
+    - {id: panel_chair, label: Panel chairperson, type: text, fixed: Jennymine G. Garcia}
+    - {id: panel_member_1, label: Panel member, type: text, fixed: Irish T. Sebastian}
+    - {id: panel_member_2, label: Panel member, type: text, fixed: Caselyn S. Dauz}
   - key: setup.system
     label: System Profile
     setup: true
@@ -44,7 +45,7 @@ tabs:
     - {id: users, label: Users or office, type: text, placeholder: the science department}
     - {id: locale, label: Locale, type: text, placeholder: Cabiao Senior High School}
     - {id: process, label: Current process being improved, type: text, placeholder: equipment borrowing process}
-    - {id: dev_model, label: Software development model, type: select, options: [Agile (Scrum), Waterfall, Rapid Application Development, Prototyping, Iterative and Incremental, V-Model]}
+    - {id: dev_model, label: Software development model, type: select, fixed: Agile, options: [Agile (Scrum), Waterfall, Rapid Application Development, Prototyping, Iterative and Incremental, V-Model]}
     - {id: modules, label: "Modules, one per line", type: textarea, rows: 5}
     - {id: roles, label: "User roles, one per line", type: textarea, rows: 3}
   - key: setup.options

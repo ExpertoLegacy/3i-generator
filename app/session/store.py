@@ -118,10 +118,15 @@ class Session:
         self.db.execute("INSERT OR IGNORE INTO parts(part_key, updated_at) VALUES(?,?)", (key, now()))
 
     def inputs(self, key: str) -> dict:
+        from app.parts.spec import with_fixed  # here, because the spec module is larger than the store
+
         row = self.db.execute("SELECT inputs_json FROM parts WHERE part_key=?", (key,)).fetchone()
-        return json.loads(row[0]) if row and row[0] else {}
+        return with_fixed(key, json.loads(row[0]) if row and row[0] else {})
 
     def save_inputs(self, key: str, data: dict) -> None:
+        from app.parts.spec import with_fixed
+
+        data = with_fixed(key, data)
         with self.lock:
             self._ensure(key)
             self.db.execute(

@@ -60,6 +60,22 @@ def translations() -> dict:
     return yaml.safe_load((BASE / "spec" / "translations.yaml").read_text(encoding="utf-8"))
 
 
+@lru_cache
+def fixed_values() -> dict:
+    """Project Setup answers set by the school, which students cannot change."""
+    found: dict = {}
+    for item in all_parts():
+        for field in item["inputs"]:
+            if "fixed" in field:
+                found.setdefault(item["key"], {})[field["id"]] = field["fixed"]
+    return found
+
+
+def with_fixed(key: str, data: dict) -> dict:
+    fixed = fixed_values().get(key)
+    return {**data, **fixed} if fixed else data
+
+
 def auto_config(key: str) -> dict | None:
     """How a part is auto-drafted, or None if it is not."""
     value = (ai_config(key) or {}).get("auto_draft")

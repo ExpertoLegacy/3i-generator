@@ -102,7 +102,9 @@
   <label for="f-{{ field.id }}">{{ field.label }}{{ field.label | tl }}</label>
   {% if field.help %}<p class="help">{{ field.help }}{{ field.help | tl }}</p>{% endif %}
   {{ suggest_button(field) }}
-  {% if field.type == 'textarea' %}
+  {% if 'fixed' in field %}
+    <input id="f-{{ field.id }}" class="fixed" value="{{ field.fixed }}" readonly aria-readonly="true" title="Set by the school">
+  {% elif field.type == 'textarea' %}
     <textarea id="f-{{ field.id }}" data-input="{{ field.id }}" data-kind="value" rows="{{ field.rows or 4 }}">{{ value or '' }}</textarea>
   {% elif field.type == 'select' %}
     <select id="f-{{ field.id }}" data-input="{{ field.id }}" data-kind="value">
@@ -208,6 +210,7 @@
       <h1>{{ part.label }}</h1>
       {% if part.optional %}<button type="button" class="quiet skip-button" id="skip-part">{{ both("Not necessary") }}</button>{% endif %}
       {% if part.help %}<p class="help">{{ part.help }}{{ part.help | tl }}</p>{% endif %}
+      {% if part.setup and part.inputs | selectattr('fixed', 'defined') | list %}{{ say("Some details are set by the school and cannot be changed.") }}{% endif %}
       {% if guidance.guidelines or guidance.curriculum_link %}
       <details class="guide">
         <summary>{{ both("Guidelines from the template") }}</summary>

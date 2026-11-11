@@ -55,6 +55,7 @@ templates = Jinja2Templates(directory=str(BASE / "app" / "templates"))
 def tagalog(text) -> Markup | str:
     """The small Tagalog line that goes under an English label."""
     translated = spec_module.translations().get(str(text))
+    translated = "" if translated == str(text) else translated
     return Markup('<small class="tl" lang="tl">{}</small>').format(translated) if translated else ""
 
 
